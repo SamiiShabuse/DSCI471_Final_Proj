@@ -13,6 +13,8 @@ grpcio==1.80.0
 h5py==3.14.0
 idna==3.15
 joblib==1.5.3
+kagglehub==1.0.1
+kagglesdk==0.1.23
 keras==3.14.1
 kiwisolver==1.5.0
 libclang==18.1.1
@@ -31,6 +33,7 @@ protobuf==7.34.1
 Pygments==2.20.0
 pyparsing==3.3.2
 python-dateutil==2.9.0.post0
+PyYAML==6.0.3
 requests==2.34.2
 rich==15.0.0
 scikit-learn==1.8.0
