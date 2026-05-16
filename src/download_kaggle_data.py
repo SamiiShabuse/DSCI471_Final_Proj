@@ -12,10 +12,6 @@ def main():
     raw_dir = Path("data/raw")
     raw_dir.mkdir(parents=True, exist_ok=True)
 
-    for item in Path(path).iterdir():
-        if item.is_file():
-            shutil.move(str(item), raw_dir / item.name)
-
 if __name__ == "__main__":
     main()
     
