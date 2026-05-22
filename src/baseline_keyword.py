@@ -2,11 +2,42 @@ import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
-def build_keyword_index(csv):
-    pass
+CSV_PATH = "data/processed/products.csv"
 
-def search_keyword():
-    pass
+def build_keyword_index(csv_path=CSV_PATH):
+    df =pd.read_csv(csv_path)
+
+    vectorizer = TfidfVectorizer(stop_words='english')
+    text_matrix = vectorizer.fit_transform(df['product_text'])
+
+    return df, vectorizer, text_matrix
+
+
+def search_keyword(query, df, vectorizer, text_matrix, top_k=5):
+    query_vector = vectorizer.transform([query])
+
+    similarities = cosine_similarity(query_vector, text_matrix).flatten()
+
+    top_indices = similarities.argsort()[::-1][:top_k]
+
+    results = df.iloc[top_indices].copy()
+    results["similarity_score"] = similarities[top_indices]
+
+    return results[
+        [
+            "id",
+            "productDisplayName",
+            "product_text",
+            "image_path",
+            "similarity_score",
+        ]
+    ]
 
 if __name__ == "__main__":
-    pass
+    df, vectorizer, text_matrix = build_keyword_index()
+
+    query = "blue casual men's shirt"
+
+    results = search_keyword(query, df, vectorizer, text_matrix, 5)
+
+    print(results)
