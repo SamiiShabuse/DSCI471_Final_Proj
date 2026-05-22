@@ -29,6 +29,13 @@ def search_keyword(query, df, vectorizer, text_matrix, top_k=5):
             "productDisplayName",
             "product_text",
             "image_path",
+            "gender",
+            "masterCategory",
+            "subCategory",
+            "articleType",
+            "baseColour",
+            "season",
+            "usage",
             "similarity_score",
         ]
     ]
