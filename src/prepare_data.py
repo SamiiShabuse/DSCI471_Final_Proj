@@ -37,6 +37,9 @@ SPLIT_COLUMNS = [
     "articleType",
     "gender",
     "baseColour",
+    "usage",
+    "season",
+    "productDisplayName",
 ]
 
 
