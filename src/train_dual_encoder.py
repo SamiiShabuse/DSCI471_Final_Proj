@@ -16,13 +16,8 @@ from dual_encoder import (
     make_training_dataset,
     resolve_image_path,
 )
+from paths import DATA_PROCESSED_DIR, EMBEDDINGS_DIR, MODELS_DIR, PROJECT_ROOT, WEIGHTS_PATH
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
-PROCESSED_DIR = PROJECT_ROOT / "data/processed"
-MODELS_DIR = PROJECT_ROOT / "models"
-EMBEDDINGS_DIR = MODELS_DIR / "embeddings"
-
-IMG_SIZE = 224
 BATCH_SIZE = 64
 BASELINE_EPOCHS = 4
 BASELINE_LR = 1e-3
@@ -32,7 +27,7 @@ UNFREEZE_FROM = -20
 
 
 def load_split(name: str) -> pd.DataFrame:
-    return pd.read_csv(PROCESSED_DIR / f"{name}.csv").reset_index(drop=True)
+    return pd.read_csv(DATA_PROCESSED_DIR / f"{name}.csv").reset_index(drop=True)
 
 
 def encode_and_cache(text_encoder, captions, cache_path: Path) -> np.ndarray:
@@ -121,9 +116,8 @@ def main():
     )
 
     MODELS_DIR.mkdir(parents=True, exist_ok=True)
-    weights_path = MODELS_DIR / "v4_image_encoder.weights.h5"
-    image_encoder.save_weights(weights_path)
-    print(f"\nSaved weights to {weights_path}")
+    image_encoder.save_weights(WEIGHTS_PATH)
+    print(f"\nSaved weights to {WEIGHTS_PATH}")
     print("Run evaluation with: python src/evaluate_all.py")
 
 

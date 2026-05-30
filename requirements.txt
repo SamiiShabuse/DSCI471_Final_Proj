@@ -49,3 +49,5 @@ tzdata==2026.2
 urllib3==2.7.0
 wheel==0.47.0
 sentence-transformers>=3.0.0
+jupyterlab>=4.0.0
+ipykernel>=6.0.0

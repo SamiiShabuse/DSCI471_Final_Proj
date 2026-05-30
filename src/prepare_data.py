@@ -7,11 +7,10 @@ from sklearn.model_selection import train_test_split
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from captions import build_caption, build_product_text, load_json_description
+from paths import DATA_PROCESSED_DIR, DATA_RAW_DIR
 
-RAW_DIR = Path("data/raw/fashion-dataset")
-PROCESSED_DIR = Path("data/processed")
-STYLES_DIR = RAW_DIR / "styles"
-IMG_DIR = RAW_DIR / "images"
+STYLES_DIR = DATA_RAW_DIR / "styles"
+IMG_DIR = DATA_RAW_DIR / "images"
 
 OUTPUT_COLUMNS = [
     "id",
@@ -44,7 +43,7 @@ SPLIT_COLUMNS = [
 
 
 def load_styles() -> pd.DataFrame:
-    styles_path = RAW_DIR / "styles.csv"
+    styles_path = DATA_RAW_DIR / "styles.csv"
     if not styles_path.exists():
         raise FileNotFoundError(f"Could not find {styles_path}")
 
@@ -57,9 +56,10 @@ def load_styles() -> pd.DataFrame:
     df = df[df["image_path"].apply(lambda path: Path(path).exists())]
     print(f"Rows with existing images: {len(df):,}")
 
-    descriptions = []
-    for product_id in df["id"]:
-        descriptions.append(load_json_description(int(product_id), STYLES_DIR))
+    descriptions = [
+        load_json_description(int(product_id), STYLES_DIR)
+        for product_id in df["id"]
+    ]
     df["description"] = descriptions
 
     df["caption"] = df.apply(build_caption, axis=1)
@@ -93,12 +93,12 @@ def save_splits(df: pd.DataFrame) -> None:
         stratify=temp_df["articleType"],
     )
 
-    PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
+    DATA_PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
 
-    df[SPLIT_COLUMNS].to_csv(PROCESSED_DIR / "pairs.csv", index=False)
-    train_df[SPLIT_COLUMNS].to_csv(PROCESSED_DIR / "train.csv", index=False)
-    val_df[SPLIT_COLUMNS].to_csv(PROCESSED_DIR / "val.csv", index=False)
-    test_df[SPLIT_COLUMNS].to_csv(PROCESSED_DIR / "test.csv", index=False)
+    df[SPLIT_COLUMNS].to_csv(DATA_PROCESSED_DIR / "pairs.csv", index=False)
+    train_df[SPLIT_COLUMNS].to_csv(DATA_PROCESSED_DIR / "train.csv", index=False)
+    val_df[SPLIT_COLUMNS].to_csv(DATA_PROCESSED_DIR / "val.csv", index=False)
+    test_df[SPLIT_COLUMNS].to_csv(DATA_PROCESSED_DIR / "test.csv", index=False)
 
     products_out = df[
         [
@@ -115,14 +115,14 @@ def save_splits(df: pd.DataFrame) -> None:
             "productDisplayName",
         ]
     ]
-    products_out.to_csv(PROCESSED_DIR / "products.csv", index=False)
+    products_out.to_csv(DATA_PROCESSED_DIR / "products.csv", index=False)
 
-    print(f"\nSaved processed files to {PROCESSED_DIR.resolve()}:")
+    print(f"\nSaved processed files to {DATA_PROCESSED_DIR.resolve()}:")
     print(f"  pairs.csv : {len(df):,} products")
     print(f"  train.csv : {len(train_df):,}")
     print(f"  val.csv   : {len(val_df):,}")
     print(f"  test.csv  : {len(test_df):,}")
-    print(f"  products.csv (legacy): {len(df):,}")
+    print(f"  products.csv: {len(df):,}")
 
 
 def main():
@@ -131,12 +131,6 @@ def main():
 
     print("\nExample caption:")
     print(df["caption"].iloc[0])
-    print("\nExample product_text (caption + JSON description when available):")
-    sample = df[df["description"] != ""].head(1)
-    if not sample.empty:
-        print(sample["product_text"].iloc[0][:500], "...")
-    else:
-        print(df["product_text"].iloc[0])
 
 
 if __name__ == "__main__":

@@ -1,0 +1,8 @@
+Setup,R@1,R@5,R@10
+"v1 nb04 (template-trained, template query)",0.106,0.332,0.488
+"v2 nb05 (expansion, template query)",0.080,0.271,0.425
+"v2 nb05 (expansion, shopper query)",0.056,0.199,0.328
+"v3 nb06 (rotation, template query)",0.068,0.247,0.387
+"v3 nb06 (rotation, shopper query)",0.049,0.192,0.314
+"v3 nb06 (rotation, short query)",0.039,0.154,0.265
+"v3 nb06 (rotation, brand query)",0.066,0.228,0.370

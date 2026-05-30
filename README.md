@@ -1,86 +1,112 @@
 # Multimodal Deep Learning Search Engine for E-commerce Fashion
 
-This repository contains the DSCI471 final project: a multimodal (image + text) dual-encoder retrieval system for fashion product search. The project trains a joint embedding space so that product images and natural-language descriptions can be retrieved with semantic similarity rather than exact keyword matches.
+DSCI471 final project (Richardson Chhin, Samii Shabuse): a multimodal dual-encoder retrieval system for fashion product search. Natural-language queries retrieve product images via a shared embedding space, evaluated against a TF-IDF keyword baseline.
 
-Key ideas:
-- Dual-encoder architecture (image encoder + text encoder)
-- Contrastive training to align matching image-text pairs
-- Retrieval by encoding queries and searching product embeddings with cosine similarity
+## Research question
 
-Repository structure
-- `data/` — raw and processed datasets. See `data/raw/fashion-dataset` for the original Kaggle files.
-- `notebooks/` — exploratory analysis and demo notebooks (e.g., `01_explore_data.ipynb`).
-- `src/` — scripts for downloading data, preparing data, and baseline code (`baseline_keyword.py`, `download_kaggle_data.py`, `prepare_data.py`).
-- `docs/` — project proposal and documentation.
+Can a dual-encoder deep learning model, trained on paired fashion images and text, outperform traditional keyword-based e-commerce search?
 
-Project flow
-- Place raw data (JSON + images) under `data/raw/fashion-dataset`.
-- Run `python src/prepare_data.py` to extract text, normalize images, and produce `data/processed/products.csv` used by notebooks and training.
-- (Modeling) Use the processed CSV to train a dual-encoder: compute image and text embeddings, train with contrastive loss, and save model checkpoints and computed product embeddings for fast retrieval.
-- Evaluate and demo using the notebooks in `notebooks/` which load the processed CSV and saved embeddings to visualize retrieval results.
+## Final model (v4)
 
+- **Image encoder:** EfficientNetB0 (ImageNet pretrained, fine-tuned) → 384-d embedding
+- **Text encoder:** Frozen `sentence-transformers/all-MiniLM-L6-v2`
+- **Training:** Contrastive loss
+- **Retrieval:** Cosine similarity (text query → image gallery)
 
-Quickstart (Windows)
+## Project structure
 
-1. Create and activate a virtual environment (recommended):
+```
+DSCI471_Final_Proj/
+├── data/
+│   ├── raw/fashion-dataset/       # Kaggle dataset (not in git)
+│   └── processed/                 # Generated splits
+├── docs/
+│   ├── DSCI471 Project Proposal.md
+│   ├── Project_Finishing_Plan.md
+│   ├── ARTIFACTS.md
+│   └── reports/
+│       ├── evaluation_results.csv
+│       └── ablations/             # v1–v4 iteration metrics
+├── models/
+│   ├── v4_image_encoder.weights.h5
+│   ├── experiments/               # v1–v5 ablation checkpoints & plots
+│   └── embeddings/
+├── notebooks/
+│   ├── richardson_experiment/     # v1→v5 ablation notebooks (Richardson)
+│   └── samii_experiment/          # Final pipeline demos (Samii)
+└── src/
+    ├── paths.py                   # Shared paths and constants
+    ├── prepare_data.py            # Data pipeline
+    ├── captions.py                # Caption + query generators
+    ├── baseline_keyword.py        # TF-IDF baseline
+    ├── dual_encoder.py            # Model architecture
+    ├── train_dual_encoder.py      # Training
+    ├── evaluate_all.py            # Unified evaluation
+    ├── metrics.py                 # Top-K, MRR, Precision@K
+    └── download_kaggle_data.py    # Dataset download
+```
+
+## Quickstart
+
+### 1. Environment
 
 ```powershell
 python -m venv venv
 venv\Scripts\activate
-```
-
-2. Install dependencies:
-
-```bash
 pip install -r requirements.txt
 ```
 
-3. Download the dataset (Kaggle)
+### 2. Download data
 
-This project uses the Fashion Product Images dataset (Kaggle). You can download it using the included helper or manually place the files under `data/raw/fashion-dataset`:
+Place the [Fashion Product Images dataset](https://www.kaggle.com/datasets/paramaggarwal/fashion-product-images-dataset) under `data/raw/fashion-dataset/`, or:
 
-```bash
+```powershell
 python src/download_kaggle_data.py
-# or manually: place 'styles.csv', 'images.csv', and folders under data/raw/fashion-dataset
 ```
 
-4. Prepare the data
+### 3. Preprocess
 
-Preprocess raw JSON, images, and metadata into a compact `data/processed/` CSV used by training and notebooks:
-
-```bash
+```powershell
 python src/prepare_data.py
 ```
 
-5. Explore and run demos
+### 4. Train
 
-Open the notebooks in `notebooks/` to explore data and run a demo retrieval:
+```powershell
+python src/train_dual_encoder.py
+```
 
-```bash
+Smoke test: `python src/train_dual_encoder.py --sample 800 --baseline-epochs 1 --finetune-epochs 1`
+
+### 5. Evaluate
+
+```powershell
+python src/evaluate_all.py
+```
+
+### 6. Notebooks
+
+```powershell
 jupyter lab notebooks/
 ```
 
-Notes on training and modeling
-- Model code and training examples live in the `src/` folder and notebooks. The intended approach is a pretrained CNN (ResNet/EfficientNet) for images and a Transformer (or lightweight text encoder) for text, trained with contrastive loss.
-- Training can be expensive — use Google Colab Pro or a GPU-enabled machine for full experiments.
+## Results (test set, 4,427 products)
 
-Data description
-- `data/raw/fashion-dataset/styles/` — per-product JSON records (attributes, descriptions).
-- `data/raw/fashion-dataset/images/` — product images (images/{id}.jpg).
-- `data/processed/products.csv` — compact table of product id, text, and processed image paths (created by `src/prepare_data.py`).
+| Query type | TF-IDF Top-1 | Dual-encoder Top-1 |
+|---|---|---|
+| templated | 0.52 | 0.17 |
+| shopper | 0.08 | 0.07 |
+| brand | 0.65 | 0.14 |
+| short | 0.07 | 0.05 |
 
-How to show this on your resume / talking points
-- Implemented a multimodal retrieval system: trained dual-encoder to align images and text for semantic search.
-- Used TensorFlow/Keras and pretrained CNN backbones for efficient feature extraction.
-- Built data pipeline to convert raw product JSON and images into trainable image-text pairs.
-- Evaluated retrieval performance with Top-K accuracy, MRR, and Precision@K; created visualizations in notebooks.
+Full metrics: `docs/reports/evaluation_results.csv`
 
-Troubleshooting & tips
-- If dataset download fails, manually obtain files from Kaggle and place them under `data/raw/fashion-dataset`.
-- For Windows path issues, ensure the virtual environment is activated before running scripts.
-- If you run out of GPU memory, reduce batch size or use a smaller backbone.
+## Troubleshooting
 
-Credits and license
-This project was developed for the DSCI471 course. See `docs/DSCI471 Project Proposal.md` for the project plan and timeline.
+- **Missing data:** Run `prepare_data.py` after downloading Kaggle files.
+- **Missing weights:** Run `train_dual_encoder.py` before full evaluation.
+- **Slow on Windows:** TensorFlow uses CPU; use Colab/WSL2 with GPU for training.
 
+## Credits
 
+DSCI471 course project. Dataset: [Fashion Product Images](https://www.kaggle.com/datasets/paramaggarwal/fashion-product-images-dataset) (Aggarwal, Kaggle).

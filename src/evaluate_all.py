@@ -17,23 +17,22 @@ from dual_encoder import (
     build_image_encoder,
     encode_images,
     encode_texts,
-    make_training_dataset,
     resolve_image_path,
 )
 from metrics import compute_retrieval_metrics, ranks_from_similarity
-
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
-PROCESSED_DIR = PROJECT_ROOT / "data/processed"
-MODELS_DIR = PROJECT_ROOT / "models"
-REPORTS_DIR = PROJECT_ROOT / "docs/reports"
-
-QUERY_STYLES = ["templated", "short", "shopper", "brand"]
-WEIGHTS_PATH = MODELS_DIR / "v4_image_encoder.weights.h5"
-RESULTS_PATH = REPORTS_DIR / "evaluation_results.csv"
+from paths import (
+    DATA_PROCESSED_DIR,
+    EVAL_RESULTS_PATH,
+    MODELS_DIR,
+    PROJECT_ROOT,
+    QUERY_STYLES,
+    TEST_EMBEDDINGS_PATH,
+    WEIGHTS_PATH,
+)
 
 
 def load_split(name: str) -> pd.DataFrame:
-    path = PROCESSED_DIR / f"{name}.csv"
+    path = DATA_PROCESSED_DIR / f"{name}.csv"
     if not path.exists():
         raise FileNotFoundError(f"Missing {path}. Run: python src/prepare_data.py")
     return pd.read_csv(path).reset_index(drop=True)
@@ -45,7 +44,7 @@ def build_queries(gallery_df: pd.DataFrame, query_style: str) -> tuple[list[str]
     target_indices = []
     id_to_idx = {product_id: idx for idx, product_id in enumerate(gallery_df["id"].values)}
 
-    for idx, row in gallery_df.iterrows():
+    for _, row in gallery_df.iterrows():
         caption = generator(row)
         if not caption:
             continue
@@ -67,8 +66,10 @@ def evaluate_tfidf(gallery_df: pd.DataFrame, query_styles: list[str]) -> list[di
         ranks = ranks_from_similarity(similarities, target_indices)
         metrics = compute_retrieval_metrics(ranks)
         rows.append({"Model": "TF-IDF", "Query type": style, **metrics})
-        print(f"TF-IDF | {style:9} | Top-1={metrics['Top-1']:.3f} Top-5={metrics['Top-5']:.3f} "
-              f"MRR={metrics['MRR']:.3f} P@5={metrics['Precision@5']:.3f}")
+        print(
+            f"TF-IDF | {style:9} | Top-1={metrics['Top-1']:.3f} Top-5={metrics['Top-5']:.3f} "
+            f"MRR={metrics['MRR']:.3f} P@5={metrics['Precision@5']:.3f}"
+        )
 
     return rows
 
@@ -100,15 +101,14 @@ def evaluate_dual_encoder(
     ]
 
     if image_embeddings is None:
-        cache_path = MODELS_DIR / "test_image_embeddings.npy"
-        if cache_path.exists() and np.load(cache_path).shape[0] == len(gallery_df):
-            image_embeddings = np.load(cache_path)
-            print(f"Loaded cached image embeddings: {cache_path}")
+        if TEST_EMBEDDINGS_PATH.exists() and np.load(TEST_EMBEDDINGS_PATH).shape[0] == len(gallery_df):
+            image_embeddings = np.load(TEST_EMBEDDINGS_PATH)
+            print(f"Loaded cached image embeddings: {TEST_EMBEDDINGS_PATH.name}")
         else:
             print("Encoding gallery images...")
             image_embeddings = encode_images(model, image_paths)
             MODELS_DIR.mkdir(parents=True, exist_ok=True)
-            np.save(cache_path, image_embeddings)
+            np.save(TEST_EMBEDDINGS_PATH, image_embeddings)
 
     rows = []
     for style in query_styles:
@@ -128,35 +128,16 @@ def evaluate_dual_encoder(
 
 def save_results(rows: list[dict], output_path: Path) -> None:
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    results = pd.DataFrame(rows)
-    results.to_csv(output_path, index=False)
+    pd.DataFrame(rows).to_csv(output_path, index=False)
     print(f"\nSaved comparison table to {output_path}")
 
 
 def main():
     parser = argparse.ArgumentParser(description="Unified retrieval evaluation")
-    parser.add_argument(
-        "--split",
-        default="test",
-        choices=["test", "val"],
-        help="Held-out split used as retrieval gallery (default: test)",
-    )
-    parser.add_argument(
-        "--baseline-only",
-        action="store_true",
-        help="Evaluate TF-IDF baseline only",
-    )
-    parser.add_argument(
-        "--dual-only",
-        action="store_true",
-        help="Evaluate dual-encoder only",
-    )
-    parser.add_argument(
-        "--sample",
-        type=int,
-        default=0,
-        help="Optional subsample size for quick runs",
-    )
+    parser.add_argument("--split", default="test", choices=["test", "val"])
+    parser.add_argument("--baseline-only", action="store_true")
+    parser.add_argument("--dual-only", action="store_true")
+    parser.add_argument("--sample", type=int, default=0, help="Subsample size for quick runs")
     args = parser.parse_args()
 
     gallery_df = load_split(args.split)
@@ -169,19 +150,19 @@ def main():
     rows = []
     if not args.dual_only:
         print("=== TF-IDF Baseline ===")
-        rows.extend(evaluate_tfidf(gallery_df, QUERY_STYLES))
+        rows.extend(evaluate_tfidf(gallery_df, list(QUERY_STYLES)))
         print()
 
     if not args.baseline_only:
         print("=== Dual-Encoder (v4) ===")
         try:
-            rows.extend(evaluate_dual_encoder(gallery_df, QUERY_STYLES))
+            rows.extend(evaluate_dual_encoder(gallery_df, list(QUERY_STYLES)))
         except FileNotFoundError as exc:
             print(exc)
             if not rows:
                 raise SystemExit(1) from exc
 
-    save_results(rows, RESULTS_PATH)
+    save_results(rows, EVAL_RESULTS_PATH)
 
 
 if __name__ == "__main__":
