@@ -17,6 +17,8 @@ Regenerate: `python src/prepare_data.py` (base splits); augmented CSVs from `not
 
 ## Final model (`models/`)
 
+**Not in git** — regenerate locally (see [`models/README.md`](../models/README.md)).
+
 | File | Description |
 |---|---|
 | `v4_image_encoder.weights.h5` | **Canonical** final EfficientNetB0 image tower |
@@ -24,11 +26,14 @@ Regenerate: `python src/prepare_data.py` (base splits); augmented CSVs from `not
 | `embeddings/val_text.npy` | Cached MiniLM val caption embeddings |
 | `test_image_embeddings.npy` | Cached test gallery image embeddings |
 
-Regenerate: `python src/train.py`
+```powershell
+python src/train.py      # creates weights + train/val text embeddings
+python src/evaluate.py   # creates test image embeddings + evaluation_results.csv
+```
 
 ## Ablation experiments (`models/experiments/`)
 
-Weights, loss curves, comparison plots, and vectorizer pickles from Richardson's v1→v5 notebooks. **No CSVs here** — metrics tables live under `docs/reports/ablations/`.
+**Not in git** — optional; reproduce via Richardson notebooks. Metrics CSVs **are** in git under `docs/reports/ablations/`.
 
 See `notebooks/richardson_experiment/README.md` for the notebook mapping.
 

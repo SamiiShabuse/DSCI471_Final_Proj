@@ -1,0 +1,26 @@
+# Data (download via src/download_kaggle_data.py; preprocess via src/prepare_data.py)
+data*
+
+# Generated model artifacts (see models/README.md)
+models/*
+!models/README.md
+!models/embeddings/
+!models/experiments/
+models/embeddings/*
+!models/embeddings/.gitkeep
+models/experiments/*
+!models/experiments/.gitkeep
+
+# Environment and secrets
+venv/
+.env*
+logs/
+
+# Editor and OS
+.vscode/
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/

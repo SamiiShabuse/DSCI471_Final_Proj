@@ -27,9 +27,9 @@ DSCI471_Final_Proj/
 │   └── reports/
 │       ├── evaluation_results.csv
 │       └── ablations/             # Ablation metrics CSVs
-├── models/
-│   ├── v4_image_encoder.weights.h5   # Final model (canonical)
-│   ├── experiments/                  # Ablation weights & plots only
+├── models/                        # Generated locally (see models/README.md)
+│   ├── v4_image_encoder.weights.h5
+│   ├── experiments/
 │   └── embeddings/
 ├── notebooks/
 │   ├── richardson_experiment/     # v1→v5 ablation notebooks
@@ -106,7 +106,8 @@ Full metrics: `docs/reports/evaluation_results.csv`
 ## Troubleshooting
 
 - **Missing data:** Run `prepare_data.py` after downloading Kaggle files.
-- **Missing weights:** Run `train.py` before full evaluation.
+- **Missing weights:** Run `python src/train.py` (~40 min CPU). See `models/README.md`.
+- **Course submission:** Submit result CSVs from `docs/reports/`; optionally attach a zip of `models/` if graders won't retrain.
 - **Slow on Windows:** TensorFlow uses CPU; use Colab/WSL2 with GPU for training.
 
 ## Credits
