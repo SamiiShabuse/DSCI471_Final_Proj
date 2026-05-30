@@ -23,11 +23,12 @@ DSCI471_Final_Proj/
 ├── docs/
 │   ├── DSCI471 Project Proposal.md
 │   ├── Project_Finishing_Plan.md
-│   ├── presentation.md            # Phase 4 slide outline
+│   ├── presentation.md            # slide outline
 │   ├── GRADING.md
 │   ├── ARTIFACTS.md
 │   └── reports/
 │       ├── evaluation_results.csv
+│       ├── final_report.md          # written report
 │       └── ablations/             # Ablation metrics CSVs
 ├── models/                        # Generated locally (see models/README.md)
 │   ├── v4_image_encoder.weights.h5
@@ -112,7 +113,8 @@ jupyter lab notebooks/
 | brand | 0.65 | 0.14 |
 | short | 0.07 | 0.05 |
 
-Full metrics: `docs/reports/evaluation_results.csv`
+Full metrics: `docs/reports/evaluation_results.csv`  
+Final report: [`docs/reports/final_report.md`](docs/reports/final_report.md)
 
 ## For graders / reproduction
 

@@ -4,6 +4,7 @@
 |---|---|
 | `evaluation_results.csv` | **Official** full test-set comparison (TF-IDF vs dual-encoder) |
 | `evaluation_results_sample.csv` | Smoke-test output from `evaluate.py --sample` (gitignored, local only) |
+| `final_report.md` | **Final written report** |
 | `ablations/` | Ablation Recall@K metrics (CSVs only — see `ablations/README.md`) |
 
 Notebooks that produced ablation results: `notebooks/richardson_experiment/`
