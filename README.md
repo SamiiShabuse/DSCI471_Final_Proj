@@ -23,6 +23,8 @@ DSCI471_Final_Proj/
 ├── docs/
 │   ├── DSCI471 Project Proposal.md
 │   ├── Project_Finishing_Plan.md
+│   ├── presentation.md            # Phase 4 slide outline
+│   ├── GRADING.md
 │   ├── ARTIFACTS.md
 │   └── reports/
 │       ├── evaluation_results.csv

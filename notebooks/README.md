@@ -15,7 +15,7 @@ Submission-ready reproduction of the final v4 model and evaluation.
 | 01 | `samii_experiment/01_explore_data.ipynb` | Dataset overview and sample images |
 | 02 | `samii_experiment/02_keyword_baseline_demo.ipynb` | TF-IDF search demo |
 | 03 | `samii_experiment/03_train.ipynb` | Final v4 training walkthrough |
-| 04 | `samii_experiment/04_final_results.ipynb` | Test results, ablation summary, retrieval demo |
+| 04 | `samii_experiment/04_final_results.ipynb` | Phase 4 results, demos, failure analysis |
 
 ## Richardson — model development (`richardson_experiment/`)
 
