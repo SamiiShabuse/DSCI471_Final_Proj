@@ -19,8 +19,8 @@ These notebooks are **integrated with the main repo**: they read from `data/proc
 
 After v4 was locked, Samii refactored training/evaluation into `src/` and reproduced results in `samii_experiment/`:
 
-- `notebooks/samii_experiment/03_train_dual_encoder.ipynb` → `python src/train_dual_encoder.py`
-- `notebooks/samii_experiment/04_final_results.ipynb` → `python src/evaluate_all.py`
+- `notebooks/samii_experiment/03_train.ipynb` → `python src/train.py`
+- `notebooks/samii_experiment/04_final_results.ipynb` → `python src/evaluate.py`
 
 ## Artifacts
 
@@ -39,6 +39,6 @@ Final unified test-set evaluation (TF-IDF vs dual-encoder): `docs/reports/evalua
 1. Download data: `python src/download_kaggle_data.py`
 2. Preprocess: `python src/prepare_data.py` (or walk through `01_explore_and_preprocess.ipynb`)
 3. Run experiment notebooks **in order** (02 → 08) to reproduce the ablation path
-4. Train final v4 via CLI: `python src/train_dual_encoder.py`
-5. Evaluate: `python src/evaluate_all.py`
+4. Train final v4 via CLI: `python src/train.py`
+5. Evaluate: `python src/evaluate.py`
 6. View combined story: `notebooks/samii_experiment/04_final_results.ipynb`

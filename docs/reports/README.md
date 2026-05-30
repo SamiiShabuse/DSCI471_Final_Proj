@@ -10,7 +10,7 @@ Notebooks that produced these results: `notebooks/richardson_experiment/` (see `
 ## Regenerate final results
 
 ```powershell
-python src/evaluate_all.py
+python src/evaluate.py
 ```
 
 ## Ablation files

@@ -2,13 +2,14 @@ import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
+from config import TFIDF_MAX_FEATURES
 from paths import PRODUCTS_CSV
 
 
 def build_keyword_index(csv_path=PRODUCTS_CSV):
     df = pd.read_csv(csv_path)
 
-    vectorizer = TfidfVectorizer(stop_words="english", max_features=50000)
+    vectorizer = TfidfVectorizer(stop_words="english", max_features=TFIDF_MAX_FEATURES)
     text_matrix = vectorizer.fit_transform(df["product_text"])
 
     return df, vectorizer, text_matrix

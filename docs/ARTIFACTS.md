@@ -36,7 +36,7 @@ See `notebooks/richardson_experiment/README.md` for the full v1→v5 notebook ma
 | `embeddings/val_text.npy` | Cached MiniLM val caption embeddings |
 | `test_image_embeddings.npy` | Cached test gallery image embeddings |
 
-Regenerate weights: `python src/train_dual_encoder.py`
+Regenerate weights: `python src/train.py`
 
 ## Results (`docs/reports/`)
 
@@ -45,4 +45,4 @@ Regenerate weights: `python src/train_dual_encoder.py`
 | `evaluation_results.csv` | Final TF-IDF vs dual-encoder comparison |
 | `ablations/*.csv` | v1–v4 iteration metrics for the report |
 
-Regenerate: `python src/evaluate_all.py`
+Regenerate: `python src/evaluate.py`

@@ -1,25 +1,16 @@
+"""Unified TF-IDF vs dual-encoder retrieval evaluation."""
+
 import argparse
-import sys
-from pathlib import Path
 
 import numpy as np
 import pandas as pd
-import tensorflow as tf
-from sentence_transformers import SentenceTransformer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-
 from captions import QUERY_GENERATORS
-from dual_encoder import (
-    FrozenTextDualEncoder,
-    build_image_encoder,
-    encode_images,
-    encode_texts,
-    resolve_image_path,
-)
+from config import TFIDF_MAX_FEATURES
 from metrics import compute_retrieval_metrics, ranks_from_similarity
+from model import encode_images, encode_texts, resolve_image_path
 from paths import (
     DATA_PROCESSED_DIR,
     EVAL_RESULTS_PATH,
@@ -27,8 +18,8 @@ from paths import (
     PROJECT_ROOT,
     QUERY_STYLES,
     TEST_EMBEDDINGS_PATH,
-    WEIGHTS_PATH,
 )
+from search import load_dual_encoder
 
 
 def load_split(name: str) -> pd.DataFrame:
@@ -55,7 +46,7 @@ def build_queries(gallery_df: pd.DataFrame, query_style: str) -> tuple[list[str]
 
 
 def evaluate_tfidf(gallery_df: pd.DataFrame, query_styles: list[str]) -> list[dict]:
-    vectorizer = TfidfVectorizer(stop_words="english", max_features=50000)
+    vectorizer = TfidfVectorizer(stop_words="english", max_features=TFIDF_MAX_FEATURES)
     gallery_matrix = vectorizer.fit_transform(gallery_df["product_text"].astype(str))
     rows = []
 
@@ -74,31 +65,13 @@ def evaluate_tfidf(gallery_df: pd.DataFrame, query_styles: list[str]) -> list[di
     return rows
 
 
-def load_dual_encoder() -> tuple[FrozenTextDualEncoder, SentenceTransformer]:
-    if not WEIGHTS_PATH.exists():
-        raise FileNotFoundError(
-            f"Dual-encoder weights not found at {WEIGHTS_PATH}. "
-            "Train first with: python src/train_dual_encoder.py"
-        )
-
-    image_encoder, _ = build_image_encoder()
-    model = FrozenTextDualEncoder(image_encoder)
-    dummy = tf.zeros((1, 224, 224, 3))
-    model.encode_images(dummy)
-    image_encoder.load_weights(WEIGHTS_PATH)
-    text_encoder = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
-    return model, text_encoder
-
-
 def evaluate_dual_encoder(
     gallery_df: pd.DataFrame,
     query_styles: list[str],
     image_embeddings: np.ndarray | None = None,
 ) -> list[dict]:
     model, text_encoder = load_dual_encoder()
-    image_paths = [
-        resolve_image_path(path, PROJECT_ROOT) for path in gallery_df["image_path"]
-    ]
+    image_paths = [resolve_image_path(path, PROJECT_ROOT) for path in gallery_df["image_path"]]
 
     if image_embeddings is None:
         if TEST_EMBEDDINGS_PATH.exists() and np.load(TEST_EMBEDDINGS_PATH).shape[0] == len(gallery_df):
@@ -126,7 +99,7 @@ def evaluate_dual_encoder(
     return rows
 
 
-def save_results(rows: list[dict], output_path: Path) -> None:
+def save_results(rows: list[dict], output_path) -> None:
     output_path.parent.mkdir(parents=True, exist_ok=True)
     pd.DataFrame(rows).to_csv(output_path, index=False)
     print(f"\nSaved comparison table to {output_path}")

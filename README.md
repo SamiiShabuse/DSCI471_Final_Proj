@@ -35,15 +35,17 @@ DSCI471_Final_Proj/
 │   ├── richardson_experiment/     # v1→v5 ablation notebooks (Richardson)
 │   └── samii_experiment/          # Final pipeline demos (Samii)
 └── src/
-    ├── paths.py                   # Shared paths and constants
-    ├── prepare_data.py            # Data pipeline
+    ├── paths.py                   # Directories and artifact paths
+    ├── config.py                  # Hyperparameters and constants
     ├── captions.py                # Caption + query generators
-    ├── baseline_keyword.py        # TF-IDF baseline
-    ├── dual_encoder.py            # Model architecture
-    ├── train_dual_encoder.py      # Training
-    ├── evaluate_all.py            # Unified evaluation
+    ├── prepare_data.py            # Data preprocessing CLI
+    ├── download_kaggle_data.py    # Dataset download CLI
+    ├── model.py                   # Dual-encoder architecture
+    ├── baseline_keyword.py        # TF-IDF baseline search
+    ├── search.py                  # Load models and run retrieval
     ├── metrics.py                 # Top-K, MRR, Precision@K
-    └── download_kaggle_data.py    # Dataset download
+    ├── train.py                   # Training CLI
+    └── evaluate.py                # Unified evaluation CLI
 ```
 
 ## Quickstart
@@ -73,15 +75,15 @@ python src/prepare_data.py
 ### 4. Train
 
 ```powershell
-python src/train_dual_encoder.py
+python src/train.py
 ```
 
-Smoke test: `python src/train_dual_encoder.py --sample 800 --baseline-epochs 1 --finetune-epochs 1`
+Smoke test: `python src/train.py --sample 800 --baseline-epochs 1 --finetune-epochs 1`
 
 ### 5. Evaluate
 
 ```powershell
-python src/evaluate_all.py
+python src/evaluate.py
 ```
 
 ### 6. Notebooks
@@ -104,7 +106,7 @@ Full metrics: `docs/reports/evaluation_results.csv`
 ## Troubleshooting
 
 - **Missing data:** Run `prepare_data.py` after downloading Kaggle files.
-- **Missing weights:** Run `train_dual_encoder.py` before full evaluation.
+- **Missing weights:** Run `train.py` before full evaluation.
 - **Slow on Windows:** TensorFlow uses CPU; use Colab/WSL2 with GPU for training.
 
 ## Credits
