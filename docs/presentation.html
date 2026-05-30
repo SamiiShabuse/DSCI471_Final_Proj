@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Multimodal Fashion Search — Presentation</title>
+  <style>
+@import url('https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&display=swap');
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Source Sans 3', 'Segoe UI', Arial, sans-serif;
+  background: #0f172a;
+  color: #f8fafc;
+}
+
+.deck { max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+
+.slide {
+  background: linear-gradient(145deg, #1e293b 0%, #0f172a 100%);
+  border: 1px solid #334155;
+  border-radius: 12px;
+  padding: 2.5rem 3rem;
+  margin-bottom: 2rem;
+  min-height: 520px;
+  page-break-after: always;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.35);
+}
+
+.slide h1 {
+  font-size: 2rem;
+  color: #93c5fd;
+  margin-bottom: 0.5rem;
+  line-height: 1.2;
+}
+
+.slide h2 {
+  font-size: 1.6rem;
+  color: #bfdbfe;
+  margin-bottom: 1rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 2px solid #2563eb;
+}
+
+.slide p, .slide li { font-size: 1.05rem; line-height: 1.55; color: #e2e8f0; }
+.slide ul { margin: 0.75rem 0 0 1.5rem; }
+.slide li { margin-bottom: 0.45rem; }
+
+.slide blockquote {
+  border-left: 4px solid #3b82f6;
+  padding: 0.75rem 1rem;
+  margin: 1rem 0;
+  background: rgba(59,130,246,0.1);
+  font-style: italic;
+  color: #cbd5e1;
+}
+
+.slide table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 0.95rem;
+}
+
+.slide th, .slide td {
+  border: 1px solid #475569;
+  padding: 0.45rem 0.6rem;
+  text-align: left;
+}
+
+.slide th { background: #334155; color: #f1f5f9; }
+
+.slide img {
+  max-width: 100%;
+  max-height: 380px;
+  display: block;
+  margin: 1rem auto 0;
+  border-radius: 8px;
+  border: 1px solid #475569;
+}
+
+.slide pre {
+  background: #0f172a;
+  border: 1px solid #475569;
+  padding: 0.75rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  overflow-x: auto;
+  color: #94a3b8;
+}
+
+.subtitle { color: #94a3b8; font-size: 1.1rem; margin-bottom: 1.5rem; }
+.footer { color: #64748b; font-size: 0.9rem; margin-top: 2rem; }
+
+@media print {
+  body { background: white; color: black; }
+  .slide {
+    background: white;
+    color: black;
+    border: 1px solid #ccc;
+    box-shadow: none;
+    min-height: auto;
+  }
+  .slide h1, .slide h2 { color: #1e40af; }
+  .slide p, .slide li { color: #1a1a1a; }
+}
+</style>
+</head>
+<body>
+<div class="deck">
+<section class="slide">
+<h1>Multimodal Deep Learning Search Engine for E-commerce Fashion</h1>
+<p class="subtitle">Richardson Chhin · Samii Shabuse · DSCI471 · May 2026</p>
+</section>
+<section class="slide">
+<h2>Problem & motivation</h2>
+
+<ul>
+<li>Shoppers describe products in natural language — e.g. <em>"a flowy floral dress with cap sleeves"</em> — but catalogs rely on keywords.</li>
+<li>We build a retriever that maps <strong>text queries → product images</strong> in a shared embedding space.</li>
+<li>Dataset: <strong>44,265</strong> fashion products (Kaggle Fashion Product Images).</li>
+</ul>
+</section>
+<section class="slide">
+<h2>Research question</h2>
+
+<blockquote>Can a dual-encoder deep learning model, trained on paired fashion images and text, <strong>outperform traditional keyword-based e-commerce search</strong>?</blockquote>
+<ul>
+<li><strong>Baseline:</strong> TF-IDF on product_text (caption + JSON description).</li>
+<li><strong>Proposed:</strong> Dual-encoder — text query → embedding ← product image embedding.</li>
+</ul>
+</section>
+<section class="slide">
+<h2>Dataset & preprocessing</h2>
+
+<table>
+<tr><th>Item</th><th>Detail</th></tr>
+<tr><td>Source</td><td>Kaggle Fashion Product Images (~44k)</td></tr>
+<tr><td>Splits</td><td>80/10/10 train / val / test</td></tr>
+<tr><td>Test gallery</td><td><strong>4,427</strong> products</td></tr>
+</table>
+<p>Pipeline: <code>src/prepare_data.py</code></p>
+</section>
+<section class="slide">
+<h2>Query styles</h2>
+
+<table>
+<tr><th>Style</th><th>Example</th></tr>
+<tr><td>templated</td><td>A men navy blue shirts, for casual wear in fall...</td></tr>
+<tr><td>shopper</td><td>men's navy blue shirt</td></tr>
+<tr><td>brand</td><td>Turtle Check Men Navy Blue Shirt</td></tr>
+<tr><td>short</td><td>navy shirt</td></tr>
+</table>
+</section>
+<section class="slide">
+<h2>Architecture (v4)</h2>
+
+<pre>Text query  →  MiniLM (frozen)  →  384-d embedding
+                                        ↓ cosine similarity
+Product image → EfficientNetB0 (fine-tuned) → 384-d embedding</pre>
+<ul>
+<li>Contrastive loss, τ = 0.07</li>
+<li>Selected after v1→v5 ablations — pretrained text encoder = largest gain</li>
+</ul>
+</section>
+<section class="slide">
+<h2>Ablation progression (validation)</h2>
+<img src="reports/figures/ablation_progression.png" alt="Ablation progression (validation)">
+<p class="footer">Recall@1 on templated queries — v4 (MiniLM) nearly doubled v1</p>
+</section>
+<section class="slide">
+<h2>Results — test set (4,427 products)</h2>
+<img src="reports/figures/test_metrics_comparison.png" alt="Results — test set (4,427 products)">
+<p class="footer">TF-IDF wins Top-1 on every query style</p>
+</section>
+<section class="slide">
+<h2>Top-1 accuracy</h2>
+
+<table>
+<tr><th>Query type</th><th>TF-IDF</th><th>Dual-encoder</th></tr>
+<tr><td>templated</td><td><strong>0.52</strong></td><td>0.17</td></tr>
+<tr><td>shopper</td><td><strong>0.08</strong></td><td>0.07</td></tr>
+<tr><td>brand</td><td><strong>0.65</strong></td><td>0.14</td></tr>
+<tr><td>short</td><td><strong>0.07</strong></td><td>0.05</td></tr>
+</table>
+</section>
+<section class="slide">
+<h2>Where dual-encoder wins (shopper)</h2>
+<img src="reports/figures/shopper_metrics_comparison.png" alt="Where dual-encoder wins (shopper)">
+<p class="footer">Higher Top-5 (0.24 vs 0.22) and MRR (0.167 vs 0.161)</p>
+</section>
+<section class="slide">
+<h2>Demo — success (templated query)</h2>
+<img src="reports/figures/demo_success_templated.png" alt="Demo — success (templated query)">
+</section>
+<section class="slide">
+<h2>Demo — head-to-head (brand query)</h2>
+<img src="reports/figures/demo_head_to_head_brand.png" alt="Demo — head-to-head (brand query)">
+</section>
+<section class="slide">
+<h2>Demo — failure (shopper query)</h2>
+<img src="reports/figures/demo_failure_shopper.png" alt="Demo — failure (shopper query)">
+</section>
+<section class="slide">
+<h2>Limitations</h2>
+
+<ul>
+<li><strong>Modality gap</strong> — text→image vs TF-IDF text→text</li>
+<li><strong>Low Top-1</strong> — both models struggle on shopper/short (~5–8%)</li>
+<li><strong>Synthetic queries</strong> — not real search logs</li>
+<li><strong>Compute</strong> — ~40 min CPU training</li>
+</ul>
+</section>
+<section class="slide">
+<h2>Conclusion & future work</h2>
+
+<p><strong>Conclusion:</strong> Keyword search wins Top-1 when the gallery is text-indexed. Dual-encoder is viable for cross-modal retrieval and wins on shopper Top-5 / MRR.</p>
+<p><strong>Future work:</strong> fine-tune text tower, hard negatives, CLIP-style pretraining, hybrid TF-IDF → dual reranking.</p>
+<p class="footer">Full report: docs/reports/final_report.pdf · Repro: docs/GRADING.md</p>
+<p class="footer"><strong>Thank you!</strong></p>
+</section>
+</div>
+</body>
+</html>

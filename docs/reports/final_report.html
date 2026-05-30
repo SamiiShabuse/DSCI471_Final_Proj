@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Final Report — Multimodal Fashion Search</title>
+  <style>
+@import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,400;0,600;0,700;1,400&family=Source+Sans+3:wght@400;600;700&display=swap');
+
+:root {
+  --text: #1a1a1a;
+  --muted: #555;
+  --accent: #1e40af;
+  --border: #ddd;
+  --bg: #fff;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: 'Source Serif 4', Georgia, serif;
+  font-size: 11pt;
+  line-height: 1.55;
+  color: var(--text);
+  max-width: 7.5in;
+  margin: 0 auto;
+  padding: 0.75in 0.85in;
+  background: var(--bg);
+}
+
+h1, h2, h3, h4 {
+  font-family: 'Source Sans 3', Arial, sans-serif;
+  line-height: 1.25;
+  page-break-after: avoid;
+}
+
+h1 { font-size: 22pt; margin-top: 0; border-bottom: 2px solid var(--accent); padding-bottom: 0.25em; }
+h2 { font-size: 15pt; margin-top: 1.4em; color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: 0.15em; }
+h3 { font-size: 12pt; margin-top: 1.1em; }
+h4 { font-size: 11pt; }
+
+p, li { orphans: 3; widows: 3; }
+blockquote {
+  margin: 1em 0;
+  padding: 0.6em 1em;
+  border-left: 4px solid var(--accent);
+  background: #f8fafc;
+  font-style: italic;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1em 0;
+  font-size: 9.5pt;
+  page-break-inside: avoid;
+}
+
+th, td {
+  border: 1px solid var(--border);
+  padding: 0.35em 0.5em;
+  text-align: left;
+}
+
+th { background: #f1f5f9; font-family: 'Source Sans 3', sans-serif; font-weight: 600; }
+
+code, pre {
+  font-family: Consolas, 'Courier New', monospace;
+  font-size: 9pt;
+}
+
+pre {
+  background: #f8fafc;
+  border: 1px solid var(--border);
+  padding: 0.75em;
+  overflow-x: auto;
+  page-break-inside: avoid;
+}
+
+figure {
+  margin: 1.2em 0;
+  page-break-inside: avoid;
+  text-align: center;
+}
+
+figure img {
+  max-width: 100%;
+  height: auto;
+  border: 1px solid var(--border);
+}
+
+figcaption {
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 9pt;
+  color: var(--muted);
+  margin-top: 0.4em;
+}
+
+hr { border: none; border-top: 1px solid var(--border); margin: 1.5em 0; }
+
+a { color: var(--accent); }
+
+.title-meta {
+  font-family: 'Source Sans 3', sans-serif;
+  color: var(--muted);
+  margin-bottom: 1.5em;
+}
+
+@media print {
+  body { padding: 0; max-width: none; }
+  a { color: var(--text); text-decoration: none; }
+  h2 { page-break-before: auto; }
+}
+</style>
+</head>
+<body>
+<h1>Final Report: Multimodal Deep Learning Search Engine for E-commerce Fashion</h1>
+<p><strong>Course:</strong> DSCI471 — Deep Learning<br />
+<strong>Team:</strong> Richardson Chhin, Samii Shabuse<br />
+<strong>Date:</strong> May 2026</p>
+<hr />
+<h2>Abstract</h2>
+<p>We built and evaluated a multimodal fashion product search system that maps natural-language queries to product images using a dual-encoder architecture trained with contrastive learning. A TF-IDF keyword baseline indexes the same catalog using rich product text (structured attributes plus optional JSON descriptions). On a held-out test gallery of 4,427 products, TF-IDF outperforms our final dual-encoder (v4) on Top-1 accuracy for all four query styles, with the largest gaps on templated (0.52 vs 0.17) and brand (0.65 vs 0.14) queries. The dual-encoder remains competitive on shopper-style queries at Top-5 (0.24 vs 0.22) and MRR (0.167 vs 0.161), indicating that cross-modal retrieval can surface relevant products in the top ranks even when rank-1 accuracy is low. We document an iterative v1→v5 model development path and conclude that keyword search remains stronger when the retrieval index is fully text-based, while dual-encoders are a viable approach when the deployment target is image galleries or text-to-image matching.</p>
+<p><strong>Keywords:</strong> multimodal retrieval, dual-encoder, contrastive learning, fashion e-commerce, TF-IDF baseline</p>
+<hr />
+<h2>1. Introduction</h2>
+<h3>1.1 Motivation</h3>
+<p>E-commerce search often relies on exact keyword matching against product titles and metadata. Shoppers frequently describe items in natural language—for example, <em>"a flowy floral dress with cap sleeves"</em>—rather than using brand names or catalog terms. When keyword overlap is weak, retrieval quality drops, hurting product discovery, conversion, and user satisfaction.</p>
+<p>Multimodal deep learning offers an alternative: learn a shared embedding space where text queries and product images are directly comparable. If a model can align visual and textual representations, it may retrieve semantically relevant products even without exact term matches.</p>
+<h3>1.2 Research question</h3>
+<blockquote>
+<p><strong>Can a dual-encoder deep learning model, trained on paired fashion images and text descriptions, outperform traditional keyword-based e-commerce search?</strong></p>
+</blockquote>
+<p>We compare a dual-encoder retriever against a TF-IDF baseline on the same test gallery, query styles, and relevance criterion.</p>
+<h3>1.3 Contributions</h3>
+<ol>
+<li>A full data pipeline for ~44k fashion products with unified captions and text indices (<code>src/prepare_data.py</code>).</li>
+<li>An iterative ablation study (v1→v5) documenting caption design, query-style augmentation, and pretrained text encoders (<code>notebooks/richardson_experiment/</code>).</li>
+<li>A reproducible evaluation framework reporting Top-1, Top-5, MRR, and Precision@5 (<code>src/evaluate.py</code>).</li>
+<li>An honest cross-modal vs text-to-text comparison explaining when each approach wins.</li>
+</ol>
+<hr />
+<h2>2. Related work</h2>
+<p><strong>Dual-encoder retrieval.</strong> CLIP (Radford et al., 2021) popularized contrastive pretraining of image and text encoders on web-scale data, enabling zero-shot retrieval by cosine similarity. Our project applies the same retrieval paradigm at course scale on a fashion catalog with domain-specific captions.</p>
+<p><strong>Fashion and e-commerce search.</strong> Prior work on fashion retrieval uses attribute prediction, siamese networks, and multimodal embeddings for recommendation and visual search. Structured attributes (color, category, gender) are common weak supervision signals—exactly what the Kaggle Fashion Product Images dataset provides.</p>
+<p><strong>Keyword baselines.</strong> TF-IDF and BM25 remain strong baselines for text-heavy catalogs, especially when product descriptions are detailed. Our baseline is intentionally strong: it indexes <code>product_text</code> that combines templated captions with JSON product descriptions when available.</p>
+<hr />
+<h2>3. Data</h2>
+<h3>3.1 Source</h3>
+<p>We use the <a href="https://www.kaggle.com/datasets/paramaggarwal/fashion-product-images-dataset">Fashion Product Images dataset</a> (Aggarwal, Kaggle): ~44,400 professionally photographed products with CSV metadata (<code>styles.csv</code>) and per-product JSON records (<code>styles/{id}.json</code>).</p>
+<p>Each product links:</p>
+<ul>
+<li>Image: <code>images/{id}.jpg</code></li>
+<li>Structured fields: gender, category, article type, color, season, usage, display name</li>
+<li>Optional free-text description in JSON</li>
+</ul>
+<h3>3.2 Preprocessing</h3>
+<p>Pipeline: <code>src/prepare_data.py</code></p>
+<ol>
+<li>Keep products with existing image files.</li>
+<li>Load JSON descriptions when present (44,136 of 44,419 imaged products).</li>
+<li>Build <strong>captions</strong> from attributes via <code>src/captions.py</code> (templated natural-language strings).</li>
+<li>Build <strong>product_text</strong> = caption + JSON description (used by TF-IDF).</li>
+<li>Drop rare <code>articleType</code> values (&lt; 10 samples).</li>
+</ol>
+<p><strong>Final corpus:</strong> 44,265 products.</p>
+<h3>3.3 Splits</h3>
+<table>
+<thead>
+<tr>
+<th>Split</th>
+<th>Products</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Train</td>
+<td>35,412</td>
+<td>Dual-encoder training</td>
+</tr>
+<tr>
+<td>Validation</td>
+<td>4,426</td>
+<td>Development / ablation metrics</td>
+</tr>
+<tr>
+<td>Test</td>
+<td>4,427</td>
+<td><strong>Final evaluation gallery</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Split ratio 80/10/10, stratified by <code>articleType</code>, random seed 42.</p>
+<p>Outputs: <code>data/processed/train.csv</code>, <code>val.csv</code>, <code>test.csv</code>, <code>products.csv</code>, <code>pairs.csv</code>.</p>
+<h3>3.4 Query styles (evaluation)</h3>
+<p>Each test product generates a query from its own row using four styles:</p>
+<table>
+<thead>
+<tr>
+<th>Style</th>
+<th>Description</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>templated</strong></td>
+<td>Full attribute caption</td>
+<td><code>A men navy blue shirts, for casual wear in fall. Turtle Check Men Navy Blue Shirt.</code></td>
+</tr>
+<tr>
+<td><strong>shopper</strong></td>
+<td>Short natural phrase</td>
+<td><code>men's navy blue shirt</code></td>
+</tr>
+<tr>
+<td><strong>brand</strong></td>
+<td>Product display name</td>
+<td><code>Turtle Check Men Navy Blue Shirt</code></td>
+</tr>
+<tr>
+<td><strong>short</strong></td>
+<td>Color + article type</td>
+<td><code>navy shirt</code></td>
+</tr>
+</tbody>
+</table>
+<p>The same styles are used for TF-IDF and dual-encoder evaluation.</p>
+<hr />
+<h2>4. Methods</h2>
+<h3>4.1 Dual-encoder architecture (final model v4)</h3>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Specification</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Image encoder</td>
+<td>EfficientNetB0 (ImageNet pretrained), 224×224 input → dense layers → <strong>384-d</strong> L2-normalized embedding</td>
+</tr>
+<tr>
+<td>Text encoder</td>
+<td>Frozen <code>sentence-transformers/all-MiniLM-L6-v2</code> → <strong>384-d</strong> L2-normalized embedding</td>
+</tr>
+<tr>
+<td>Similarity</td>
+<td>Cosine similarity (dot product of normalized vectors)</td>
+</tr>
+<tr>
+<td>Training loss</td>
+<td>Symmetric contrastive loss (InfoNCE-style), temperature τ = 0.07</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Training procedure</strong> (<code>src/train.py</code>):</p>
+<ol>
+<li><strong>Phase 1:</strong> Freeze EfficientNet backbone; train image tower 4 epochs, Adam lr = 1e-3, batch size 64.</li>
+<li><strong>Phase 2:</strong> Unfreeze last 20 EfficientNet layers; fine-tune 3 epochs, lr = 1e-5.</li>
+<li>Text embeddings precomputed and cached (<code>models/embeddings/train_text.npy</code>, <code>val_text.npy</code>).</li>
+</ol>
+<p>Implementation: <code>src/model.py</code>, <code>src/config.py</code>.</p>
+<h3>4.2 TF-IDF baseline</h3>
+<ul>
+<li><code>TfidfVectorizer</code> (English stop words, max 50,000 features) on test-gallery <code>product_text</code>.</li>
+<li>Query embedded in the same space; cosine similarity ranking.</li>
+<li>Implementation: <code>src/baseline_keyword.py</code>, evaluation in <code>src/evaluate.py</code>.</li>
+</ul>
+<p>This baseline performs <strong>text-to-text</strong> retrieval with access to full product descriptions. The dual-encoder performs <strong>text-to-image</strong> retrieval—a harder cross-modal task.</p>
+<h3>4.3 Evaluation protocol</h3>
+<ul>
+<li><strong>Gallery:</strong> all 4,427 test products.</li>
+<li><strong>Queries:</strong> one per product per style; target = that product's ID.</li>
+<li><strong>Metrics:</strong> Top-1, Top-5, MRR, Precision@5 (standard retrieval definitions in <code>src/metrics.py</code>).</li>
+<li><strong>Fairness:</strong> identical gallery, queries, and relevance rule for both models.</li>
+</ul>
+<p>Regenerate: <code>python src/evaluate.py</code> → <code>docs/reports/evaluation_results.csv</code>.</p>
+<p><strong>Note:</strong> Development ablations (Section 5) report Recall@K on the <strong>validation</strong> set. Final numbers in Section 6 are on the <strong>held-out test</strong> set.</p>
+<hr />
+<h2>5. Experiments and model selection</h2>
+<p>Richardson led an iterative ablation (<code>notebooks/richardson_experiment/01–08</code>). Samii unified training and evaluation in <code>src/</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Version</th>
+<th>Key change</th>
+<th>Outcome</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>v1</strong></td>
+<td>Scratch text encoder, templated captions, full dataset</td>
+<td>Baseline dual-encoder</td>
+</tr>
+<tr>
+<td><strong>v2</strong></td>
+<td>Four query-style captions (templated, short, shopper, brand)</td>
+<td>More realistic query diversity</td>
+</tr>
+<tr>
+<td><strong>v3</strong></td>
+<td>Random query style per training epoch (rotation)</td>
+<td>Did not clearly beat v2</td>
+</tr>
+<tr>
+<td><strong>v4</strong></td>
+<td>Frozen MiniLM text encoder + EfficientNet image tower</td>
+<td><strong>Selected final model</strong> — best validation Recall@K</td>
+</tr>
+<tr>
+<td><strong>v5</strong></td>
+<td>v4 + caption rotation</td>
+<td>Did not beat v4 on validation</td>
+</tr>
+</tbody>
+</table>
+<h3>5.1 Validation ablation (Recall@1, templated query)</h3>
+<table>
+<thead>
+<tr>
+<th>Model</th>
+<th>R@1</th>
+<th>R@5</th>
+<th>R@10</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>v1 (scratch text)</td>
+<td>0.106</td>
+<td>0.332</td>
+<td>0.488</td>
+</tr>
+<tr>
+<td>v2 (caption expansion)</td>
+<td>0.080</td>
+<td>0.271</td>
+<td>0.425</td>
+</tr>
+<tr>
+<td>v3 (rotation)</td>
+<td>0.068</td>
+<td>0.247</td>
+<td>0.387</td>
+</tr>
+<tr>
+<td><strong>v4 (MiniLM text)</strong></td>
+<td><strong>0.208</strong></td>
+<td><strong>0.523</strong></td>
+<td><strong>0.668</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Pretrained text encoding was the largest single improvement. v5 templated R@1 (0.155) remained below v4 (0.208). Source: <code>docs/reports/ablations/v1_v2_v3_v4_comparison.csv</code>, <code>final_comparison.csv</code>.</p>
+<p><strong>Figure 3</strong> — Validation Recall@1 progression (templated query):</p>
+<p><img alt="Figure 3: Ablation progression v1 through v4 on validation set" src="figures/ablation_progression.png" /></p>
+<p><strong>Figure 4</strong> — v4 contrastive training loss and v4 vs v5 per query style (validation):</p>
+<p><img alt="Figure 4a: v4 training loss curve" src="figures/v4_training_loss.png" /></p>
+<p><img alt="Figure 4b: v4 vs v5 recall by query style" src="figures/v4_vs_v5_per_style.png" /></p>
+<h3>5.2 Hyperparameters (v4, final)</h3>
+<p>See <code>src/config.py</code>: batch size 64, τ = 0.07, 4 + 3 training epochs, image size 224, embedding dim 384.</p>
+<hr />
+<h2>6. Results</h2>
+<h3>6.1 Test-set comparison (4,427 products)</h3>
+<p><strong>Table 1 — Full metrics.</strong> Source: <code>docs/reports/evaluation_results.csv</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Query type</th>
+<th>Top-1</th>
+<th>Top-5</th>
+<th>MRR</th>
+<th>Precision@5</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>TF-IDF</td>
+<td>templated</td>
+<td><strong>0.523</strong></td>
+<td><strong>0.805</strong></td>
+<td><strong>0.649</strong></td>
+<td><strong>0.161</strong></td>
+</tr>
+<tr>
+<td>TF-IDF</td>
+<td>shopper</td>
+<td><strong>0.084</strong></td>
+<td>0.216</td>
+<td>0.161</td>
+<td><strong>0.043</strong></td>
+</tr>
+<tr>
+<td>TF-IDF</td>
+<td>brand</td>
+<td><strong>0.651</strong></td>
+<td><strong>0.891</strong></td>
+<td><strong>0.756</strong></td>
+<td><strong>0.178</strong></td>
+</tr>
+<tr>
+<td>TF-IDF</td>
+<td>short</td>
+<td><strong>0.073</strong></td>
+<td><strong>0.201</strong></td>
+<td><strong>0.146</strong></td>
+<td><strong>0.040</strong></td>
+</tr>
+<tr>
+<td>Dual-encoder (v4)</td>
+<td>templated</td>
+<td>0.174</td>
+<td>0.462</td>
+<td>0.314</td>
+<td>0.092</td>
+</tr>
+<tr>
+<td>Dual-encoder (v4)</td>
+<td>shopper</td>
+<td>0.074</td>
+<td><strong>0.241</strong></td>
+<td><strong>0.167</strong></td>
+<td>0.048</td>
+</tr>
+<tr>
+<td>Dual-encoder (v4)</td>
+<td>brand</td>
+<td>0.140</td>
+<td>0.402</td>
+<td>0.270</td>
+<td>0.080</td>
+</tr>
+<tr>
+<td>Dual-encoder (v4)</td>
+<td>short</td>
+<td>0.052</td>
+<td>0.176</td>
+<td>0.126</td>
+<td>0.035</td>
+</tr>
+</tbody>
+</table>
+<p><em>Bold indicates higher value for each query type / metric pair.</em></p>
+<p><strong>Figure 1</strong> — Test-set retrieval metrics (TF-IDF vs dual-encoder v4):</p>
+<p><img alt="Figure 1: Test-set retrieval metrics comparison across four query styles" src="figures/test_metrics_comparison.png" /></p>
+<p><strong>Figure 2</strong> — Shopper queries: dual-encoder wins Top-5 and MRR despite lower Top-1:</p>
+<p><img alt="Figure 2: Shopper query metrics where dual-encoder is competitive" src="figures/shopper_metrics_comparison.png" /></p>
+<h3>6.2 Answer to the research question</h3>
+<p><strong>No — on our test setup, the dual-encoder does not outperform TF-IDF on Top-1 accuracy for any query style.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Query type</th>
+<th>TF-IDF Top-1</th>
+<th>Dual-encoder Top-1</th>
+<th>Δ (dual − TF-IDF)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>templated</td>
+<td>0.523</td>
+<td>0.174</td>
+<td>−0.349</td>
+</tr>
+<tr>
+<td>shopper</td>
+<td>0.084</td>
+<td>0.074</td>
+<td>−0.010</td>
+</tr>
+<tr>
+<td>brand</td>
+<td>0.651</td>
+<td>0.140</td>
+<td>−0.511</td>
+</tr>
+<tr>
+<td>short</td>
+<td>0.073</td>
+<td>0.052</td>
+<td>−0.022</td>
+</tr>
+</tbody>
+</table>
+<p>The gap is largest when queries align with indexed text: <strong>brand</strong> (product names) and <strong>templated</strong> (full captions matching <code>product_text</code>).</p>
+<p><strong>Partial success:</strong> On <strong>shopper</strong> queries, the dual-encoder achieves higher <strong>Top-5</strong> (0.241 vs 0.216) and <strong>MRR</strong> (0.167 vs 0.161). So cross-modal retrieval sometimes ranks the correct product in the top 5 even when it misses rank 1—relevant for UI designs that show multiple results.</p>
+<h3>6.3 Qualitative retrieval examples</h3>
+<p><strong>Figure 5</strong> — Dual-encoder success (templated query, correct product at rank 1):</p>
+<p><img alt="Figure 5: Successful templated query retrieval at rank 1" src="figures/demo_success_templated.png" /></p>
+<p><strong>Figure 6</strong> — Head-to-head on a brand query (TF-IDF top row vs dual-encoder bottom row):</p>
+<p><img alt="Figure 6: TF-IDF vs dual-encoder on the same brand query" src="figures/demo_head_to_head_brand.png" /></p>
+<p><strong>Figure 7</strong> — Shopper-query failure (correct product not in dual-encoder top 5):</p>
+<p><img alt="Figure 7: Shopper query failure case for dual-encoder" src="figures/demo_failure_shopper.png" /></p>
+<p>Interactive demos: <code>notebooks/samii_experiment/04_final_results.ipynb</code>.</p>
+<hr />
+<h2>7. Discussion</h2>
+<h3>7.1 Why TF-IDF wins Top-1</h3>
+<ol>
+<li>
+<p><strong>Modality mismatch in evaluation.</strong> TF-IDF searches text against text, including JSON descriptions. The dual-encoder must match text queries to <strong>visual</strong> embeddings. Attribute text does not fully determine appearance (fabric, cut, pattern details).</p>
+</li>
+<li>
+<p><strong>Brand and templated queries favor keywords.</strong> Brand queries are exact product titles; templated queries closely mirror indexed captions. TF-IDF is optimized for this overlap.</p>
+</li>
+<li>
+<p><strong>Training signal vs deployment.</strong> The dual-encoder is trained with templated training captions but evaluated on diverse query styles. v2–v3 ablations showed query-style design matters; v4 improved substantially but did not close the gap to a strong text index.</p>
+</li>
+</ol>
+<h3>7.2 When deep learning still helps</h3>
+<ul>
+<li><strong>Image-forward retrieval:</strong> If the product gallery is images only (no rich text at index time), dual-encoders are appropriate; TF-IDF cannot apply.</li>
+<li><strong>Top-5 / ranking quality:</strong> Shopper-query MRR and Top-5 suggest the model learns some cross-modal alignment useful for shortlist display.</li>
+<li><strong>Semantic generalization (potential):</strong> With more diverse training queries and larger batch contrastive learning, gap may narrow—v4's jump over v1 (validation R@1: 0.106 → 0.208) shows headroom from better text towers.</li>
+</ul>
+<h3>7.3 Development lessons</h3>
+<ul>
+<li>Pretrained text encoders (v4) mattered more than caption rotation (v3, v5).</li>
+<li>Unified evaluation (<code>src/evaluate.py</code>) on a fixed test gallery was essential for a fair TF-IDF comparison.</li>
+<li>Separating validation ablations from final test metrics avoided overfitting the report narrative to dev sets.</li>
+</ul>
+<hr />
+<h2>8. Limitations</h2>
+<ol>
+<li><strong>Synthetic queries</strong> — Generated from catalog attributes, not real user search logs.</li>
+<li><strong>Low absolute Top-1</strong> — Both models achieve ≤ 8.4% Top-1 on shopper/short queries; fashion attributes are ambiguous (many navy shirts).</li>
+<li><strong>Compute</strong> — Full training ~40 minutes on CPU; no large-scale hyperparameter search.</li>
+<li><strong>Frozen text encoder</strong> — MiniLM was not fine-tuned on fashion domain text.</li>
+<li><strong>Single positive per query</strong> — Standard retrieval eval; other same-category products may also be visually relevant.</li>
+<li><strong>Reproducibility</strong> — Model weights are generated locally (<code>models/README.md</code>); result CSVs are committed to git.</li>
+</ol>
+<hr />
+<h2>9. Conclusion and future work</h2>
+<p>We implemented a complete multimodal fashion search pipeline: data processing, dual-encoder training with contrastive loss, a TF-IDF baseline, and unified retrieval metrics on 4,427 test products. After five model iterations, <strong>v4</strong> (EfficientNetB0 + frozen MiniLM) was selected as the final architecture.</p>
+<p><strong>Conclusion:</strong> Traditional keyword search outperforms our dual-encoder on Top-1 accuracy across all query types in this catalog, primarily because TF-IDF operates in text-to-text space with rich product descriptions. The dual-encoder remains a viable cross-modal retriever with better shopper-query Top-5 and MRR, and it is the appropriate choice when retrieval targets image embeddings directly.</p>
+<p><strong>Future work:</strong></p>
+<ul>
+<li>Fine-tune the text encoder on fashion caption pairs</li>
+<li>Hard negative mining and larger effective batch sizes</li>
+<li>CLIP-style domain pretraining on fashion image–text pairs</li>
+<li>Evaluation on real user queries and click-through data</li>
+<li>Hybrid retrieval: TF-IDF shortlist → dual-encoder reranking</li>
+</ul>
+<hr />
+<h2>References</h2>
+<ul>
+<li>
+<p>Aggarwal, Param. <em>Fashion Product Images Dataset.</em> Kaggle, 2019.<br />
+  https://www.kaggle.com/datasets/paramaggarwal/fashion-product-images-dataset</p>
+</li>
+<li>
+<p>Radford, A., et al. (2021). <em>Learning Transferable Visual Models From Natural Language Supervision</em> (CLIP). ICML.</p>
+</li>
+<li>
+<p>Reimers, N., &amp; Gurevych, I. (2019). <em>Sentence-BERT: Sentence Embeddings using Siamese BERT-Networks.</em> EMNLP.</p>
+</li>
+<li>
+<p>Tan, M., &amp; Le, Q. (2019). <em>EfficientNet: Rethinking Model Scaling for Convolutional Neural Networks.</em> ICML.</p>
+</li>
+</ul>
+<hr />
+<h2>Appendix A — Reproducibility</h2>
+<pre><code class="language-powershell">python -m venv venv &amp;&amp; venv\Scripts\activate
+pip install -r requirements.txt
+python src/download_kaggle_data.py
+python src/prepare_data.py
+python src/prepare_data.py --check
+python src/train.py
+python src/evaluate.py
+</code></pre>
+<p>Grading guide: <code>docs/GRADING.md</code><br />
+Artifacts: <code>docs/ARTIFACTS.md</code><br />
+Presentation: <code>docs/presentation.md</code> · Slides: <code>docs/presentation_slides.md</code><br />
+PDF report: <code>docs/reports/final_report.pdf</code> (or print <code>final_report.html</code>)<br />
+Interactive results: <code>notebooks/samii_experiment/04_final_results.ipynb</code></p>
+<hr />
+<h2>Appendix B — Team contributions</h2>
+<table>
+<thead>
+<tr>
+<th>Richardson Chhin</th>
+<th>Samii Shabuse</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>v1→v5 experiment design and notebooks</td>
+<td>Unified <code>src/</code> training and evaluation pipeline</td>
+</tr>
+<tr>
+<td>Caption and query-style ablations</td>
+<td>Data preprocessing and documentation</td>
+</tr>
+<tr>
+<td>Final model selection (v4)</td>
+<td>Test-set evaluation, Phase 4 notebook, final report integration</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p><em>Report generated for DSCI471 Final Project. Result tables reflect <code>docs/reports/evaluation_results.csv</code> as of project submission.</em></p>
+</body>
+</html>

@@ -24,11 +24,17 @@ DSCI471_Final_Proj/
 │   ├── DSCI471 Project Proposal.md
 │   ├── Project_Finishing_Plan.md
 │   ├── presentation.md            # slide outline
+│   ├── presentation_slides.md     # Marp slides (export to PPTX/PDF)
+│   ├── presentation.html          # browser slide deck
+│   ├── presentation.pdf           # exported slides
 │   ├── GRADING.md
 │   ├── ARTIFACTS.md
 │   └── reports/
 │       ├── evaluation_results.csv
 │       ├── final_report.md          # written report
+│       ├── final_report.html        # print-ready HTML
+│       ├── final_report.pdf         # exported report
+│       ├── figures/                 # embedded charts + demos
 │       └── ablations/             # Ablation metrics CSVs
 ├── models/                        # Generated locally (see models/README.md)
 │   ├── v4_image_encoder.weights.h5
@@ -104,6 +110,47 @@ python src/evaluate.py --sample 500
 jupyter lab notebooks/
 ```
 
+## Full reproduction (copy-paste)
+
+Run from the repo root after cloning. Requires Python 3.10+ and [Kaggle API credentials](https://github.com/Kaggle/kagglehub) for the download step (~5 GB dataset).
+
+```powershell
+# 1. Environment
+python -m venv venv
+venv\Scripts\activate
+pip install -r requirements.txt
+
+# 2. Data (skip if data/raw/fashion-dataset/ already exists)
+python src/download_kaggle_data.py
+
+# 3. Preprocess → train/val/test splits (44,265 products)
+python src/prepare_data.py
+python src/prepare_data.py --check
+
+# 4. Train v4 dual-encoder (~40–45 min CPU; writes models/v4_image_encoder.weights.h5)
+python src/train.py
+
+# 5. Evaluate TF-IDF + dual-encoder on test gallery (4,427 products)
+python src/evaluate.py
+```
+
+**Expected outputs**
+
+| Step | Output |
+|---|---|
+| Preprocess | `data/processed/train.csv`, `val.csv`, `test.csv`, `pairs.csv` |
+| Train | `models/v4_image_encoder.weights.h5`, `models/embeddings/*.npy` |
+| Evaluate | `docs/reports/evaluation_results.csv` |
+
+**Verify against committed results** (TF-IDF should match exactly; dual-encoder within ~1% due to training non-determinism):
+
+```powershell
+python src/evaluate.py --output docs/reports/evaluation_results_rerun.csv
+python scripts/compare_eval_results.py docs/reports/evaluation_results.csv docs/reports/evaluation_results_rerun.csv
+```
+
+Quick smoke test without full training (~5 min): see **[docs/GRADING.md](docs/GRADING.md)**.
+
 ## Results (test set, 4,427 products)
 
 | Query type | TF-IDF Top-1 | Dual-encoder Top-1 |
@@ -114,7 +161,8 @@ jupyter lab notebooks/
 | short | 0.07 | 0.05 |
 
 Full metrics: `docs/reports/evaluation_results.csv`  
-Final report: [`docs/reports/final_report.md`](docs/reports/final_report.md)
+Final report: [`docs/reports/final_report.pdf`](docs/reports/final_report.pdf) · [Markdown](docs/reports/final_report.md)  
+Presentation: [`docs/presentation.pdf`](docs/presentation.pdf) · [Marp slides](docs/presentation_slides.md)
 
 ## For graders / reproduction
 

@@ -161,6 +161,16 @@ Richardson led an iterative ablation (`notebooks/richardson_experiment/01–08`)
 
 Pretrained text encoding was the largest single improvement. v5 templated R@1 (0.155) remained below v4 (0.208). Source: `docs/reports/ablations/v1_v2_v3_v4_comparison.csv`, `final_comparison.csv`.
 
+**Figure 3** — Validation Recall@1 progression (templated query):
+
+![Figure 3: Ablation progression v1 through v4 on validation set](figures/ablation_progression.png)
+
+**Figure 4** — v4 contrastive training loss and v4 vs v5 per query style (validation):
+
+![Figure 4a: v4 training loss curve](figures/v4_training_loss.png)
+
+![Figure 4b: v4 vs v5 recall by query style](figures/v4_vs_v5_per_style.png)
+
 ### 5.2 Hyperparameters (v4, final)
 
 See `src/config.py`: batch size 64, τ = 0.07, 4 + 3 training epochs, image size 224, embedding dim 384.
@@ -186,7 +196,13 @@ See `src/config.py`: batch size 64, τ = 0.07, 4 + 3 training epochs, image size
 
 *Bold indicates higher value for each query type / metric pair.*
 
-**Figures:** metric bar charts, retrieval demos, and failure analysis — `notebooks/samii_experiment/04_final_results.ipynb`.
+**Figure 1** — Test-set retrieval metrics (TF-IDF vs dual-encoder v4):
+
+![Figure 1: Test-set retrieval metrics comparison across four query styles](figures/test_metrics_comparison.png)
+
+**Figure 2** — Shopper queries: dual-encoder wins Top-5 and MRR despite lower Top-1:
+
+![Figure 2: Shopper query metrics where dual-encoder is competitive](figures/shopper_metrics_comparison.png)
 
 ### 6.2 Answer to the research question
 
@@ -202,6 +218,22 @@ See `src/config.py`: batch size 64, τ = 0.07, 4 + 3 training epochs, image size
 The gap is largest when queries align with indexed text: **brand** (product names) and **templated** (full captions matching `product_text`).
 
 **Partial success:** On **shopper** queries, the dual-encoder achieves higher **Top-5** (0.241 vs 0.216) and **MRR** (0.167 vs 0.161). So cross-modal retrieval sometimes ranks the correct product in the top 5 even when it misses rank 1—relevant for UI designs that show multiple results.
+
+### 6.3 Qualitative retrieval examples
+
+**Figure 5** — Dual-encoder success (templated query, correct product at rank 1):
+
+![Figure 5: Successful templated query retrieval at rank 1](figures/demo_success_templated.png)
+
+**Figure 6** — Head-to-head on a brand query (TF-IDF top row vs dual-encoder bottom row):
+
+![Figure 6: TF-IDF vs dual-encoder on the same brand query](figures/demo_head_to_head_brand.png)
+
+**Figure 7** — Shopper-query failure (correct product not in dual-encoder top 5):
+
+![Figure 7: Shopper query failure case for dual-encoder](figures/demo_failure_shopper.png)
+
+Interactive demos: `notebooks/samii_experiment/04_final_results.ipynb`.
 
 ---
 
@@ -283,7 +315,8 @@ python src/evaluate.py
 
 Grading guide: `docs/GRADING.md`  
 Artifacts: `docs/ARTIFACTS.md`  
-Presentation: `docs/presentation.md`  
+Presentation: `docs/presentation.md` · Slides: `docs/presentation_slides.md`  
+PDF report: `docs/reports/final_report.pdf` (or print `final_report.html`)  
 Interactive results: `notebooks/samii_experiment/04_final_results.ipynb`
 
 ---
