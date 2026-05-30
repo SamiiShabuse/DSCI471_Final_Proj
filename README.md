@@ -26,14 +26,14 @@ DSCI471_Final_Proj/
 │   ├── ARTIFACTS.md
 │   └── reports/
 │       ├── evaluation_results.csv
-│       └── ablations/             # v1–v4 iteration metrics
+│       └── ablations/             # Ablation metrics CSVs
 ├── models/
-│   ├── v4_image_encoder.weights.h5
-│   ├── experiments/               # v1–v5 ablation checkpoints & plots
+│   ├── v4_image_encoder.weights.h5   # Final model (canonical)
+│   ├── experiments/                  # Ablation weights & plots only
 │   └── embeddings/
 ├── notebooks/
-│   ├── richardson_experiment/     # v1→v5 ablation notebooks (Richardson)
-│   └── samii_experiment/          # Final pipeline demos (Samii)
+│   ├── richardson_experiment/     # v1→v5 ablation notebooks
+│   └── samii_experiment/          # Final pipeline notebooks
 └── src/
     ├── paths.py                   # Directories and artifact paths
     ├── config.py                  # Hyperparameters and constants

@@ -3,7 +3,7 @@
 | File | Description |
 |---|---|
 | `evaluation_results.csv` | Final unified comparison: TF-IDF vs dual-encoder on test set |
-| `ablations/` | Historical model iteration metrics (v1–v5 experiments) |
+| `ablations/` | Ablation Recall@K metrics (CSVs only — see `ablations/README.md`) |
 
 Notebooks that produced these results: `notebooks/richardson_experiment/` (see `notebooks/richardson_experiment/README.md`).
 

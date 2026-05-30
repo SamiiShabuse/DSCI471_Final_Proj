@@ -6,9 +6,9 @@ DATA_RAW_DIR = PROJECT_ROOT / "data" / "raw" / "fashion-dataset"
 DATA_PROCESSED_DIR = PROJECT_ROOT / "data" / "processed"
 MODELS_DIR = PROJECT_ROOT / "models"
 EMBEDDINGS_DIR = MODELS_DIR / "embeddings"
-EXPERIMENTS_DIR = MODELS_DIR / "experiments"
+EXPERIMENTS_DIR = MODELS_DIR / "experiments"  # ablation weights, plots, pickles
 REPORTS_DIR = PROJECT_ROOT / "docs" / "reports"
-ABLATIONS_DIR = REPORTS_DIR / "ablations"
+ABLATIONS_DIR = REPORTS_DIR / "ablations"  # ablation metrics CSVs (report tables)
 
 PRODUCTS_CSV = DATA_PROCESSED_DIR / "products.csv"
 WEIGHTS_PATH = MODELS_DIR / "v4_image_encoder.weights.h5"

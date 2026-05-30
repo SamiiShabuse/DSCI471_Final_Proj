@@ -1,7 +1,0 @@
-Direction,Metric,Baseline,Fine-tuned,Δ (pp)
-Text -> Image,R@1,0.080,0.106,+2.6
-Text -> Image,R@5,0.271,0.332,+6.1
-Text -> Image,R@10,0.420,0.488,+6.8
-Image -> Text,R@1,0.085,0.103,+1.9
-Image -> Text,R@5,0.293,0.338,+4.5
-Image -> Text,R@10,0.437,0.491,+5.4

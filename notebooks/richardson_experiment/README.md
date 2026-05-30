@@ -2,7 +2,10 @@
 
 Richardson's iterative ablation notebooks — the full model-development story from scratch dual-encoder through caption augmentation, rotation, and pretrained text encoders.
 
-These notebooks are **integrated with the main repo**: they read from `data/processed/`, write checkpoints to `models/experiments/`, and share the same Kaggle dataset layout as `src/prepare_data.py`.
+These notebooks read from `data/processed/` and write artifacts to two locations:
+
+- **`docs/reports/ablations/`** — comparison CSVs (metrics for the report)
+- **`models/experiments/`** — weights, plots, and pickles
 
 ## How this fits the project narrative
 
@@ -26,8 +29,9 @@ After v4 was locked, Samii refactored training/evaluation into `src/` and reprod
 
 | Location | Contents |
 |---|---|
-| `models/experiments/` | Per-version weights, loss curves, comparison plots |
-| `docs/reports/ablations/` | Recall@K comparison CSVs (v1–v5) |
+| `docs/reports/ablations/` | Recall@K comparison CSVs |
+| `models/experiments/` | Per-version weights, loss curves, plots, pickles |
+| `models/v4_image_encoder.weights.h5` | Canonical final model weights |
 | `data/processed/` | Splits + augmented long-form CSVs (`train_aug.csv`, etc.) |
 
 Key comparison table: `docs/reports/ablations/v1_v2_v3_v4_comparison.csv`
