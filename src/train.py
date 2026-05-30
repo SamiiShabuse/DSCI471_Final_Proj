@@ -24,6 +24,7 @@ from model import (
     resolve_image_path,
 )
 from paths import DATA_PROCESSED_DIR, EMBEDDINGS_DIR, MODELS_DIR, PROJECT_ROOT, WEIGHTS_PATH
+from prepare_data import validate_splits
 
 
 def load_split(name: str) -> pd.DataFrame:
@@ -50,6 +51,8 @@ def main():
     parser.add_argument("--finetune-epochs", type=int, default=FT_EPOCHS)
     parser.add_argument("--sample", type=int, default=0, help="Train on a subset for smoke tests")
     args = parser.parse_args()
+
+    validate_splits()
 
     tf.random.set_seed(42)
     np.random.seed(42)

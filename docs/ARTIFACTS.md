@@ -44,6 +44,8 @@ See `notebooks/richardson_experiment/README.md` for the notebook mapping.
 | `evaluation_results.csv` | Final TF-IDF vs dual-encoder comparison (test set) |
 | `ablations/*.csv` | Ablation Recall@K tables (single source of truth) |
 
-Regenerate final results: `python src/evaluate.py`
+Regenerate final results: `python src/evaluate.py` (full test set)
 
-Ablation CSVs are written when re-running Richardson experiment notebooks; see `docs/reports/ablations/README.md`.
+Smoke test: `python src/evaluate.py --sample 500` → `evaluation_results_sample.csv`
+
+Grading workflow: `docs/GRADING.md`

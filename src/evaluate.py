@@ -1,6 +1,7 @@
 """Unified TF-IDF vs dual-encoder retrieval evaluation."""
 
 import argparse
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -14,11 +15,13 @@ from model import encode_images, encode_texts, resolve_image_path
 from paths import (
     DATA_PROCESSED_DIR,
     EVAL_RESULTS_PATH,
+    EVAL_RESULTS_SAMPLE_PATH,
     MODELS_DIR,
     PROJECT_ROOT,
     QUERY_STYLES,
     TEST_EMBEDDINGS_PATH,
 )
+from prepare_data import validate_splits
 from search import load_dual_encoder
 
 
@@ -69,19 +72,27 @@ def evaluate_dual_encoder(
     gallery_df: pd.DataFrame,
     query_styles: list[str],
     image_embeddings: np.ndarray | None = None,
+    *,
+    cache_embeddings: bool = True,
 ) -> list[dict]:
     model, text_encoder = load_dual_encoder()
     image_paths = [resolve_image_path(path, PROJECT_ROOT) for path in gallery_df["image_path"]]
 
     if image_embeddings is None:
-        if TEST_EMBEDDINGS_PATH.exists() and np.load(TEST_EMBEDDINGS_PATH).shape[0] == len(gallery_df):
+        use_cache = (
+            cache_embeddings
+            and TEST_EMBEDDINGS_PATH.exists()
+            and np.load(TEST_EMBEDDINGS_PATH).shape[0] == len(gallery_df)
+        )
+        if use_cache:
             image_embeddings = np.load(TEST_EMBEDDINGS_PATH)
             print(f"Loaded cached image embeddings: {TEST_EMBEDDINGS_PATH.name}")
         else:
             print("Encoding gallery images...")
             image_embeddings = encode_images(model, image_paths)
-            MODELS_DIR.mkdir(parents=True, exist_ok=True)
-            np.save(TEST_EMBEDDINGS_PATH, image_embeddings)
+            if cache_embeddings:
+                MODELS_DIR.mkdir(parents=True, exist_ok=True)
+                np.save(TEST_EMBEDDINGS_PATH, image_embeddings)
 
     rows = []
     for style in query_styles:
@@ -110,13 +121,28 @@ def main():
     parser.add_argument("--split", default="test", choices=["test", "val"])
     parser.add_argument("--baseline-only", action="store_true")
     parser.add_argument("--dual-only", action="store_true")
-    parser.add_argument("--sample", type=int, default=0, help="Subsample size for quick runs")
+    parser.add_argument(
+        "--sample",
+        type=int,
+        default=0,
+        help="Subsample gallery for quick smoke tests (does not overwrite full results)",
+    )
+    parser.add_argument(
+        "--output",
+        type=Path,
+        default=None,
+        help="Optional CSV output path (default: full or sample results file)",
+    )
     args = parser.parse_args()
 
-    gallery_df = load_split(args.split)
-    if args.sample and args.sample < len(gallery_df):
-        gallery_df = gallery_df.sample(args.sample, random_state=42).reset_index(drop=True)
-        print(f"Using subsample of {len(gallery_df):,} products")
+    validate_splits()
+
+    full_gallery = load_split(args.split)
+    gallery_df = full_gallery
+    is_sample = bool(args.sample and args.sample < len(full_gallery))
+    if is_sample:
+        gallery_df = full_gallery.sample(args.sample, random_state=42).reset_index(drop=True)
+        print(f"Sample mode: using {len(gallery_df):,} of {len(full_gallery):,} products")
 
     print(f"Gallery: {args.split}.csv ({len(gallery_df):,} products)\n")
 
@@ -126,16 +152,31 @@ def main():
         rows.extend(evaluate_tfidf(gallery_df, list(QUERY_STYLES)))
         print()
 
+    cache_embeddings = not is_sample
     if not args.baseline_only:
         print("=== Dual-Encoder (v4) ===")
         try:
-            rows.extend(evaluate_dual_encoder(gallery_df, list(QUERY_STYLES)))
+            rows.extend(
+                evaluate_dual_encoder(
+                    gallery_df,
+                    list(QUERY_STYLES),
+                    cache_embeddings=cache_embeddings,
+                )
+            )
         except FileNotFoundError as exc:
             print(exc)
             if not rows:
                 raise SystemExit(1) from exc
 
-    save_results(rows, EVAL_RESULTS_PATH)
+    if args.output is not None:
+        output_path = args.output
+    elif is_sample:
+        output_path = EVAL_RESULTS_SAMPLE_PATH
+        print("\nNote: sample run saved separately; evaluation_results.csv unchanged.")
+    else:
+        output_path = EVAL_RESULTS_PATH
+
+    save_results(rows, output_path)
 
 
 if __name__ == "__main__":

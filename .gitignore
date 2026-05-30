@@ -1,5 +1,6 @@
 # Data (download via src/download_kaggle_data.py; preprocess via src/prepare_data.py)
-data*
+data/*
+!data/README.md
 
 # Generated model artifacts (see models/README.md)
 models/*
@@ -24,3 +25,6 @@ logs/
 __pycache__/
 *.py[cod]
 .ipynb_checkpoints/
+
+# Smoke-test eval output (full results stay in evaluation_results.csv)
+docs/reports/evaluation_results_sample.csv

@@ -125,9 +125,54 @@ def save_splits(df: pd.DataFrame) -> None:
     print(f"  products.csv: {len(df):,}")
 
 
+def validate_splits(processed_dir: Path | None = None) -> None:
+    """Raise FileNotFoundError or ValueError if processed splits are missing or stale."""
+    processed_dir = processed_dir or DATA_PROCESSED_DIR
+    required = ("train.csv", "val.csv", "test.csv", "products.csv")
+    missing_files = [name for name in required if not (processed_dir / name).exists()]
+    if missing_files:
+        raise FileNotFoundError(
+            f"Missing processed files in {processed_dir}: {', '.join(missing_files)}. "
+            "Run: python src/prepare_data.py"
+        )
+
+    for name in ("train.csv", "val.csv", "test.csv"):
+        path = processed_dir / name
+        columns = pd.read_csv(path, nrows=0).columns.tolist()
+        missing_cols = [col for col in SPLIT_COLUMNS if col not in columns]
+        if missing_cols:
+            raise ValueError(
+                f"{path.name} is missing columns {missing_cols}. "
+                "Your splits may be from an old experiment copy. "
+                "Re-run: python src/prepare_data.py"
+            )
+
+    products_cols = pd.read_csv(processed_dir / "products.csv", nrows=0).columns.tolist()
+    if "product_text" not in products_cols:
+        raise ValueError(
+            "products.csv is missing product_text. Re-run: python src/prepare_data.py"
+        )
+
+
 def main():
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Build train/val/test splits from Kaggle data")
+    parser.add_argument(
+        "--check",
+        action="store_true",
+        help="Validate existing splits without rebuilding",
+    )
+    args = parser.parse_args()
+
+    if args.check:
+        validate_splits()
+        print(f"OK: processed splits in {DATA_PROCESSED_DIR.resolve()} look valid.")
+        return
+
     df = load_styles()
     save_splits(df)
+    validate_splits()
 
     print("\nExample caption:")
     print(df["caption"].iloc[0])

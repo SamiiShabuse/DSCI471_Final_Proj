@@ -70,7 +70,10 @@ python src/download_kaggle_data.py
 
 ```powershell
 python src/prepare_data.py
+python src/prepare_data.py --check   # verify splits
 ```
+
+See [`data/README.md`](data/README.md) if you see missing-column errors.
 
 ### 4. Train
 
@@ -84,6 +87,12 @@ Smoke test: `python src/train.py --sample 800 --baseline-epochs 1 --finetune-epo
 
 ```powershell
 python src/evaluate.py
+```
+
+Quick smoke test (does **not** overwrite official results):
+
+```powershell
+python src/evaluate.py --sample 500
 ```
 
 ### 6. Notebooks
@@ -103,9 +112,15 @@ jupyter lab notebooks/
 
 Full metrics: `docs/reports/evaluation_results.csv`
 
+## For graders / reproduction
+
+Step-by-step testing (smoke vs full runs, what is in git): **[docs/GRADING.md](docs/GRADING.md)**
+
+Proposal (canonical): `docs/DSCI471 Project Proposal.md` (`.docx` / `.pdf` are submission copies).
+
 ## Troubleshooting
 
-- **Missing data:** Run `prepare_data.py` after downloading Kaggle files.
+- **Missing data / stale splits:** `python src/prepare_data.py` — see `data/README.md`
 - **Missing weights:** Run `python src/train.py` (~40 min CPU). See `models/README.md`.
 - **Course submission:** Submit result CSVs from `docs/reports/`; optionally attach a zip of `models/` if graders won't retrain.
 - **Slow on Windows:** TensorFlow uses CPU; use Colab/WSL2 with GPU for training.
