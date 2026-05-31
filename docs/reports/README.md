@@ -8,7 +8,7 @@
 | `final_report.html` | Print-ready HTML report |
 | `final_report.pdf` | PDF export (`python scripts/build_report_pdf.py`) |
 | `figures/` | Embedded figures for report and slides |
-| `ablations/` | Ablation Recall@K metrics (CSVs only — see `ablations/README.md`) |
+| `ablations/` | Ablation Recall@K metrics (CSVs only - see `ablations/README.md`) |
 
 Notebooks that produced ablation results: `notebooks/richardson_experiment/`
 

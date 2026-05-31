@@ -11,7 +11,7 @@ data/
     ├── pairs.csv            # All products
     ├── train.csv / val.csv / test.csv
     ├── products.csv         # TF-IDF index
-    └── *_aug.csv            # Optional — from Richardson notebooks (see below)
+    └── *_aug.csv            # Optional - from Richardson notebooks (see below)
 ```
 
 ## Required setup (every clone / fresh environment)
@@ -35,6 +35,6 @@ python src/prepare_data.py           # fix
 
 ## Augmented splits (`*_aug.csv`)
 
-Files such as `train_aug.csv` come from `notebooks/richardson_experiment/05_caption_augmentation.ipynb`. They use a **different schema** (`style` column for query-type rotation) and are only needed for Richardson's v2–v5 ablation notebooks — not for the main `src/train.py` / `src/evaluate.py` pipeline.
+Files such as `train_aug.csv` come from `notebooks/richardson_experiment/05_caption_augmentation.ipynb`. They use a **different schema** (`style` column for query-type rotation) and are only needed for Richardson's v2-v5 ablation notebooks - not for the main `src/train.py` / `src/evaluate.py` pipeline.
 
 Do not replace `train.csv` / `val.csv` / `test.csv` with the augmented versions.

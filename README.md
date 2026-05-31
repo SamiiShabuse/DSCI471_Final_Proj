@@ -127,7 +127,7 @@ python src/download_kaggle_data.py
 python src/prepare_data.py
 python src/prepare_data.py --check
 
-# 4. Train v4 dual-encoder (~40–45 min CPU; writes models/v4_image_encoder.weights.h5)
+# 4. Train v4 dual-encoder (~40-45 min CPU; writes models/v4_image_encoder.weights.h5)
 python src/train.py
 
 # 5. Evaluate TF-IDF + dual-encoder on test gallery (4,427 products)
@@ -172,7 +172,7 @@ Proposal (canonical): `docs/DSCI471 Project Proposal.md` (`.docx` / `.pdf` are s
 
 ## Troubleshooting
 
-- **Missing data / stale splits:** `python src/prepare_data.py` — see `data/README.md`
+- **Missing data / stale splits:** `python src/prepare_data.py` - see `data/README.md`
 - **Missing weights:** Run `python src/train.py` (~40 min CPU). See `models/README.md`.
 - **Course submission:** Submit result CSVs from `docs/reports/`; optionally attach a zip of `models/` if graders won't retrain.
 - **Slow on Windows:** TensorFlow uses CPU; use Colab/WSL2 with GPU for training.

@@ -1,23 +1,23 @@
 # Richardson experiment (v1 → v5)
 
-Richardson's iterative ablation notebooks — the full model-development story from scratch dual-encoder through caption augmentation, rotation, and pretrained text encoders.
+Richardson's iterative ablation notebooks - the full model-development story from scratch dual-encoder through caption augmentation, rotation, and pretrained text encoders.
 
 These notebooks read from `data/processed/` and write artifacts to two locations:
 
-- **`docs/reports/ablations/`** — comparison CSVs (metrics for the report)
-- **`models/experiments/`** — weights, plots, and pickles
+- **`docs/reports/ablations/`** - comparison CSVs (metrics for the report)
+- **`models/experiments/`** - weights, plots, and pickles
 
 ## How this fits the project narrative
 
 | Step | Notebook | What changed | Version |
 |---|---|---|---|
-| Explore + preprocess | `01_explore_and_preprocess.ipynb` | Dataset EDA, caption templates, train/val/test splits | — |
+| Explore + preprocess | `01_explore_and_preprocess.ipynb` | Dataset EDA, caption templates, train/val/test splits | - |
 | Baseline dual-encoder | `02_train_dual_encoder.ipynb` | Scratch text encoder, templated captions | **v1** |
 | Fine-tune + compare | `03_finetune_and_compare.ipynb` | Fine-tune image encoder vs baseline | v1 ft |
 | Full dataset | `04_final_full_dataset.ipynb` | Scale to full ~44k products | v1 full |
 | Caption augmentation | `05_caption_augmentation.ipynb` | 4 query styles (templated, short, shopper, brand) | **v2** |
 | Caption rotation | `06_caption_rotation.ipynb` | Random query style per epoch during training | **v3** |
-| Pretrained text | `07_pretrained_text_encoder.ipynb` | Frozen MiniLM text encoder — **selected final model** | **v4** |
+| Pretrained text | `07_pretrained_text_encoder.ipynb` | Frozen MiniLM text encoder - **selected final model** | **v4** |
 | Pretrained + rotation | `08_pretrained_with_rotation.ipynb` | v4 + caption rotation (did not beat v4) | **v5** |
 
 After v4 was locked, Samii refactored training/evaluation into `src/` and reproduced results in `samii_experiment/`:

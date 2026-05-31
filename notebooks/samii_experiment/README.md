@@ -1,4 +1,4 @@
-# Samii experiment — unified pipeline
+# Samii experiment - unified pipeline
 
 Final v4 dual-encoder training, TF-IDF baseline demo, and unified test-set evaluation.
 
