@@ -332,3 +332,13 @@ Interactive results: `notebooks/samii_experiment/04_final_results.ipynb`
 ---
 
 *Report generated for DSCI471 Final Project. Result tables reflect `docs/reports/evaluation_results.csv` as of project submission.*
+
+---
+
+## Additional reproducibility artifacts
+
+- Speaker notes and reflection: [docs/presentation_assets/speaker_notes.md](docs/presentation_assets/speaker_notes.md)
+- Methodology appendix and small-ablation suggestions: [docs/reports/appendix_methodology.md](docs/reports/appendix_methodology.md)
+- EDA addendum (figure generation snippets): [docs/reports/EDA_addendum.md](docs/reports/EDA_addendum.md)
+- Quick reproduction tips and smoke-run scripts: [docs/reports/REPRO_Tips.md](docs/reports/REPRO_Tips.md)
+

@@ -22,7 +22,9 @@ from paths import (
     TEST_EMBEDDINGS_PATH,
 )
 from prepare_data import validate_splits
-from search import load_dual_encoder
+    # NOTE: avoid importing `search.load_dual_encoder` at module import time because
+    # sentence-transformers and TensorFlow are heavy optional deps. Import lazily
+    # inside `evaluate_dual_encoder` so `--baseline-only` runs without them.
 
 
 def load_split(name: str) -> pd.DataFrame:
@@ -75,6 +77,9 @@ def evaluate_dual_encoder(
     *,
     cache_embeddings: bool = True,
 ) -> list[dict]:
+    # Import locally to avoid heavy optional imports at module import time.
+    from search import load_dual_encoder
+
     model, text_encoder = load_dual_encoder()
     image_paths = [resolve_image_path(path, PROJECT_ROOT) for path in gallery_df["image_path"]]
 
