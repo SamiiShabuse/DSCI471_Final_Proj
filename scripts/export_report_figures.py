@@ -100,6 +100,76 @@ def export_shopper_comparison_chart() -> None:
     _save(fig, "shopper_metrics_comparison.png")
 
 
+def export_eda_figures() -> None:
+    products = pd.read_csv(PROJECT_ROOT / "data" / "processed" / "products.csv")
+
+    top_articles = products["articleType"].value_counts().head(20).sort_values()
+    fig, ax = plt.subplots(figsize=(9, 6))
+    top_articles.plot.barh(ax=ax, color="#2563eb")
+    ax.set_title("Top 20 article types after preprocessing", fontweight="bold")
+    ax.set_xlabel("Products")
+    ax.set_ylabel("Article type")
+    ax.grid(axis="x", alpha=0.25)
+    plt.tight_layout()
+    _save(fig, "eda_article_distribution.png")
+
+    top_colors = products["baseColour"].fillna("Unknown").value_counts().head(15)
+    fig, ax = plt.subplots(figsize=(9, 4.8))
+    top_colors.plot.bar(ax=ax, color="#64748b")
+    ax.set_title("Most common product colors", fontweight="bold")
+    ax.set_xlabel("Base color")
+    ax.set_ylabel("Products")
+    ax.tick_params(axis="x", rotation=35)
+    ax.grid(axis="y", alpha=0.25)
+    plt.tight_layout()
+    _save(fig, "eda_color_distribution.png")
+
+    master_counts = products["masterCategory"].fillna("Unknown").value_counts()
+    fig, ax = plt.subplots(figsize=(8, 4.8))
+    master_counts.plot.bar(ax=ax, color="#0f766e")
+    ax.set_title("Catalog scale by master category", fontweight="bold")
+    ax.set_xlabel("Master category")
+    ax.set_ylabel("Products")
+    ax.tick_params(axis="x", rotation=25)
+    ax.grid(axis="y", alpha=0.25)
+    plt.tight_layout()
+    _save(fig, "eda_master_category_distribution.png")
+
+    text_lengths = products["product_text"].fillna("").str.len()
+    clipped = text_lengths.clip(upper=text_lengths.quantile(0.99))
+    fig, ax = plt.subplots(figsize=(8, 4.8))
+    ax.hist(clipped, bins=40, color="#7c3aed", alpha=0.85)
+    ax.axvline(text_lengths.median(), color="#111827", linestyle="--", linewidth=1.5, label=f"Median = {text_lengths.median():.0f} chars")
+    ax.set_title("Product-text length distribution", fontweight="bold")
+    ax.set_xlabel("Characters in product_text (99th percentile clipped)")
+    ax.set_ylabel("Products")
+    ax.legend()
+    ax.grid(axis="y", alpha=0.25)
+    plt.tight_layout()
+    _save(fig, "eda_text_length_distribution.png")
+
+    sample = (
+        products.sort_values("articleType")
+        .groupby("articleType", group_keys=False)
+        .sample(1, random_state=42)
+        .sample(12, random_state=7)
+        .reset_index(drop=True)
+    )
+    fig, axes = plt.subplots(3, 4, figsize=(10, 8))
+    for ax, (_, row) in zip(axes.flatten(), sample.iterrows()):
+        image_path = PROJECT_ROOT / str(row["image_path"])
+        if not image_path.exists():
+            image_path = PROJECT_ROOT / "data" / "raw" / "fashion-dataset" / "images" / Path(row["image_path"]).name
+        img = Image.open(image_path)
+        ax.imshow(img)
+        ax.axis("off")
+        title = f"{row['articleType']}\n{row['baseColour']}"
+        ax.set_title(title[:42], fontsize=8)
+    fig.suptitle("Representative catalog images across article types", fontweight="bold")
+    plt.tight_layout()
+    _save(fig, "eda_sample_images_grid.png")
+
+
 def copy_experiment_plots() -> None:
     copies = [
         ("v4_loss_curve.png", "v4_training_loss.png"),
@@ -226,6 +296,7 @@ def export_retrieval_demos() -> None:
 
 def main() -> None:
     print("Exporting report figures...")
+    export_eda_figures()
     export_test_metrics_chart()
     export_ablation_chart()
     export_shopper_comparison_chart()
