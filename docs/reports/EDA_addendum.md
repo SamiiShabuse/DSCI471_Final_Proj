@@ -1,22 +1,29 @@
-# EDA Addendum — recommended figures and generation commands
+# EDA Addendum
 
-This file lists a minimal set of exploratory figures to add to the report to show data understanding.
+The exploratory data analysis figures have been generated and integrated into
+`docs/reports/final_report.md` and `README.md`.
 
-Recommended figures (export to `docs/reports/figures/`):
-- `class_distribution.png` — bar chart of `articleType` frequencies (use `data/processed/products.csv`).
-- `color_distribution.png` — top 20 `baseColour` counts.
-- `missing_json_counts.png` — stacked bar of how many products have JSON descriptions by category.
-- `example_images_grid.png` — 3×5 grid of sample images for common vs rare `articleType`.
+## Generated Figures
 
-Notebook cell / script snippet (pandas + matplotlib):
+| Figure | Purpose |
+|---|---|
+| `docs/reports/figures/eda_article_distribution.png` | Shows class imbalance across the top article types |
+| `docs/reports/figures/eda_color_distribution.png` | Shows the most common base colors |
+| `docs/reports/figures/eda_master_category_distribution.png` | Shows catalog scale by master category |
+| `docs/reports/figures/eda_text_length_distribution.png` | Shows distribution of `product_text` lengths |
+| `docs/reports/figures/eda_sample_images_grid.png` | Shows representative catalog images |
 
-```python
-import pandas as pd
-import matplotlib.pyplot as plt
+## Regenerate
 
-df = pd.read_csv('data/processed/products.csv')
-df['articleType'].value_counts().nlargest(30).plot.bar(figsize=(10,6))
-plt.tight_layout(); plt.savefig('docs/reports/figures/class_distribution.png')
+```powershell
+python scripts/export_report_figures.py
 ```
 
-Notes for graders: add the above figures and reference them from `docs/reports/final_report.md` to recover the 2 EDA points.
+## Key Dataset Facts
+
+- Final processed corpus: 44,265 products
+- Train/validation/test split: 35,412 / 4,426 / 4,427
+- Article types: 107
+- Base colors: 46
+- Products with loaded JSON descriptions: 44,136
+- Median `product_text` length: 674 characters
