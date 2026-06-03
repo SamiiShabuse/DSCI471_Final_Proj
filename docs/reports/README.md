@@ -27,7 +27,7 @@ Quick smoke test (does not overwrite `evaluation_results.csv`):
 python src/evaluate.py --sample 500
 ```
 
-See [`docs/GRADING.md`](../GRADING.md) for the full grading workflow.
+See [`GRADING.md`](../../GRADING.md) for the full grading workflow.
 
 ## Ablation files
 

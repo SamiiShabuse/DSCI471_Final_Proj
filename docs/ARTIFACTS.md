@@ -9,7 +9,7 @@ All paths are defined in `src/paths.py`.
 | `pairs.csv` | All 44,265 products |
 | `train.csv` | Training split (35,412) |
 | `val.csv` | Validation split (4,426) |
-| `test.csv` | Test split (4,427) — evaluation gallery |
+| `test.csv` | Test split (4,427) - evaluation gallery |
 | `products.csv` | TF-IDF index (`product_text` with JSON descriptions) |
 | `train_aug.csv`, `val_aug.csv`, `test_aug.csv` | Long-form augmented splits (4 query styles per product) |
 
@@ -17,7 +17,7 @@ Regenerate: `python src/prepare_data.py` (base splits); augmented CSVs from `not
 
 ## Final model (`models/`)
 
-**Not in git** — regenerate locally (see [`models/README.md`](../models/README.md)).
+**Not in git** - regenerate locally (see [`models/README.md`](../models/README.md)).
 
 | File | Description |
 |---|---|
@@ -33,7 +33,7 @@ python src/evaluate.py   # creates test image embeddings + evaluation_results.cs
 
 ## Ablation experiments (`models/experiments/`)
 
-**Not in git** — optional; reproduce via Richardson notebooks. Metrics CSVs **are** in git under `docs/reports/ablations/`.
+**Not in git** - optional; reproduce via Richardson notebooks. Metrics CSVs **are** in git under `docs/reports/ablations/`.
 
 See `notebooks/richardson_experiment/README.md` for the notebook mapping.
 
@@ -46,6 +46,6 @@ See `notebooks/richardson_experiment/README.md` for the notebook mapping.
 
 Regenerate final results: `python src/evaluate.py` (full test set)
 
-Smoke test: `python src/evaluate.py --sample 500` → `evaluation_results_sample.csv`
+Smoke test: `python src/evaluate.py --sample 500` -> `evaluation_results_sample.csv`
 
-Grading workflow: `docs/GRADING.md`
+Grading workflow: `GRADING.md`

@@ -8,11 +8,11 @@ This document tracks the remaining work needed to deliver a complete submission 
 
 ---
 
-## Proposal Requirements → Deliverables
+## Proposal Requirements -> Deliverables
 
 | Proposal section | Required deliverable |
 |---|---|
-| **Data Collection** | Full dataset pipeline: image–text pairs, preprocessing, train/val/test splits |
+| **Data Collection** | Full dataset pipeline: image-text pairs, preprocessing, train/val/test splits |
 | **Methodology** | Dual-encoder (CNN + text encoder), contrastive training, cosine retrieval, **vs keyword baseline** |
 | **Timeline Week 10** | Results, visualizations, **end-of-term presentation** |
 | **Timeline Week 11** | **Final report**: methods, results, limitations |
@@ -37,7 +37,7 @@ This document tracks the remaining work needed to deliver a complete submission 
 
 ---
 
-## Phase 1 — Lock the Official Experiment
+## Phase 1 - Lock the Official Experiment
 
 **Goal:** One canonical dataset, one text pipeline, one chosen final model.
 
@@ -58,12 +58,12 @@ This document tracks the remaining work needed to deliver a complete submission 
 
 ---
 
-## Phase 2 — Unified Evaluation
+## Phase 2 - Unified Evaluation
 
 **Goal:** Answer the research question with one fair comparison table.
 
 - [x] **2.1 Single evaluation script/notebook**
-  - `src/evaluate.py` — same held-out test gallery for TF-IDF and dual-encoder
+  - `src/evaluate.py` - same held-out test gallery for TF-IDF and dual-encoder
   - Reports Top-1, Top-5, MRR, Precision@5 (per proposal)
 
 - [x] **2.2 Query types**
@@ -88,12 +88,12 @@ python src/evaluate.py
 
 ---
 
-## Phase 3 — Consolidate the Repo
+## Phase 3 - Consolidate the Repo
 
 **Goal:** A grader/teammate can follow one clear path.
 
 - [x] **3.1 Consolidated project structure**
-  - Integrated Richardson's experiment notebooks into `notebooks/richardson_experiment/` (v1→v5 ablation story)
+  - Integrated Richardson's experiment notebooks into `notebooks/richardson_experiment/` (v1->v5 ablation story)
   - Ablation weights/plots in `models/experiments/`; metrics CSVs in `docs/reports/ablations/` only
   - Single pipeline: `src/` (CLI) + `notebooks/` (demos + experiments), shared via `src/paths.py`
   - Added `src/paths.py` as shared path/constants module
@@ -101,20 +101,20 @@ python src/evaluate.py
   - Model weights excluded from git; `models/README.md` documents regeneration
 
 - [x] **3.2 Notebooks integrated with src/**
-  - `samii_experiment/01–04` — final pipeline demos
-  - `richardson_experiment/01–08` — full v1→v5 development notebooks (see `richardson_experiment/README.md`)
+  - `samii_experiment/01-04` - final pipeline demos
+  - `richardson_experiment/01-08` - full v1->v5 development notebooks (see `richardson_experiment/README.md`)
 
 - [x] **3.3 Reproducible artifacts documented**
   - `docs/ARTIFACTS.md`, `docs/reports/README.md`
 
 - [x] **3.4 Requirements and README updated**
   - `requirements.txt`: direct dependencies with minimum versions
-  - `README.md`, `docs/GRADING.md`, `data/README.md`: reproduction guide for graders
+  - `README.md`, `GRADING.md`, `data/README.md`: reproduction guide for graders
   - `prepare_data.py --check` validates split schema; sample evals no longer overwrite full results
 
 ---
 
-## Phase 4 — Results, Visuals, and Demo
+## Phase 4 - Results, Visuals, and Demo
 
 **Goal:** Week 10 presentation deliverables.
 
@@ -133,20 +133,20 @@ python src/evaluate.py
 
 ---
 
-## Phase 5 — Final Report
+## Phase 5 - Final Report
 
 **Goal:** Week 11 written report in `docs/reports/`.
 
 - [x] **5.1 Write final report** (`docs/reports/final_report.md`)
-  1. Introduction — research question, motivation ✓
-  2. Related work — CLIP-style retrieval, fashion search ✓
-  3. Data — source, size, image–text pairs, splits, preprocessing ✓
-  4. Methods — encoders, contrastive loss, retrieval, baseline ✓
-  5. Experiments — hyperparameters, v1–v5 ablation ✓
-  6. Results — unified comparison table + figure references ✓
-  7. Discussion — when deep learning wins vs loses ✓
-  8. Limitations ✓
-  9. Conclusion & future work ✓
+  1. Introduction - research question, motivation done
+  2. Related work - CLIP-style retrieval, fashion search done
+  3. Data - source, size, image-text pairs, splits, preprocessing done
+  4. Methods - encoders, contrastive loss, retrieval, baseline done
+  5. Experiments - hyperparameters, v1-v5 ablation done
+  6. Results - unified comparison table + figure references done
+  7. Discussion - when deep learning wins vs loses done
+  8. Limitations done
+  9. Conclusion & future work done
 
 - [x] **5.2 Explicitly answer the research question** with test-set numbers (Section 6.2)
 
@@ -169,5 +169,5 @@ python src/evaluate.py
 |---|---|---|
 | 2026-05-30 | Plan created | This document |
 | 2026-05-30 | Structure consolidation | Integrated richardson_experiment/ + samii_experiment/, src/paths.py |
-| 2026-05-30 | Phase 5 final report | `docs/reports/final_report.md` — full write-up + research question answer |
+| 2026-05-30 | Phase 5 final report | `docs/reports/final_report.md` - full write-up + research question answer |
 | 2026-05-30 | Report polish | Figures, PDF report, presentation PDF + Marp slides |

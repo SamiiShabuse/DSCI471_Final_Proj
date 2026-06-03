@@ -20,10 +20,10 @@ python scripts/hybrid_rerank.py --sample 500 --tfidf-topk 50 --rerank-k 5
 3) If you cannot download the Kaggle dataset, you can still verify TF-IDF baseline code paths by placing a small subset CSV at `data/processed/products.csv` formatted like the project splits (columns: id, product_text, image_path, etc.) and then run:
 
 ```powershell
-python -m src.evaluate --baseline-only --sample 100
+python src/evaluate.py --baseline-only --sample 100
 ```
 
 4) Where results are saved
-- `docs/reports/evaluation_results.csv` — committed final results.
-- `docs/reports/evaluation_results_sample.csv` — sample results created by smoke runs.
-- `docs/reports/hybrid_results.csv` — hybrid reranker output (if run).
+- `docs/reports/evaluation_results.csv` - committed final results.
+- `docs/reports/evaluation_results_sample.csv` - sample results created by smoke runs.
+- `docs/reports/hybrid_results.csv` - hybrid reranker output (if run).

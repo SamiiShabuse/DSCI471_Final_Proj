@@ -438,7 +438,9 @@ Run a small sample training/evaluation pipeline:
 python scripts/run_sample_pipeline.py
 ```
 
-The first dual-encoder run may download `sentence-transformers/all-MiniLM-L6-v2` from Hugging Face unless it is already cached.
+Internet/Wi-Fi is required the first time the dual-encoder path loads
+`sentence-transformers/all-MiniLM-L6-v2` from Hugging Face. If the model is
+already cached locally, the run can proceed offline.
 
 ---
 
@@ -450,6 +452,8 @@ For graders who do not want to retrain:
 - The validation ablation metrics are in `docs/reports/ablations/`.
 - The final written report is `docs/reports/final_report.pdf`.
 - If dual-encoder inference must run immediately, include or request `models/v4_image_encoder.weights.h5` and `models/test_image_embeddings.npy`.
+- The first dual-encoder inference or training run also needs internet/Wi-Fi
+  for Hugging Face MiniLM unless the Hugging Face cache is already present.
 
 For full reproducibility:
 
@@ -458,7 +462,7 @@ For full reproducibility:
 - Run `src/train.py`.
 - Run `src/evaluate.py`.
 
-See [`docs/GRADING.md`](docs/GRADING.md) and [`docs/ARTIFACTS.md`](docs/ARTIFACTS.md) for exact artifact expectations.
+See [`GRADING.md`](GRADING.md) and [`docs/ARTIFACTS.md`](docs/ARTIFACTS.md) for exact artifact expectations.
 
 ---
 

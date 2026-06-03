@@ -1,6 +1,6 @@
 # Ablation metrics
 
-Recall@K comparison tables from Richardson's v1→v5 experiment notebooks (`notebooks/richardson_experiment/`).
+Recall@K comparison tables from Richardson's v1-to-v5 experiment notebooks (`notebooks/richardson_experiment/`).
 
 | File | Produced by |
 |---|---|

@@ -25,9 +25,10 @@ python src/prepare_data.py
 python src/prepare_data.py --check
 ```
 
-Kaggle download requires Kaggle API credentials. The first dual-encoder run also
-downloads `sentence-transformers/all-MiniLM-L6-v2` from Hugging Face unless it is
-already cached locally.
+Kaggle download requires Kaggle API credentials. The first dual-encoder training
+or inference run also requires internet/Wi-Fi so `sentence-transformers` can
+load `sentence-transformers/all-MiniLM-L6-v2` from Hugging Face. If MiniLM is
+already cached locally, the dual-encoder path can run offline.
 
 If graders need dual-encoder inference without network access or retraining,
 submit these artifacts separately:
@@ -48,6 +49,16 @@ python src/evaluate.py --baseline-only
 ```
 
 This requires only `data/processed/` and confirms the TF-IDF path and data schema.
+
+For a faster smoke check that does not touch the official results file:
+
+```powershell
+python src/prepare_data.py --check
+python src/evaluate.py --baseline-only --sample 100 --output docs/reports/evaluation_results_smoke_check.csv
+```
+
+This validates the processed split schema and writes a small local smoke-test CSV.
+The official full-test metrics remain in `docs/reports/evaluation_results.csv`.
 
 ### 2. Smoke Test With Subsample
 
@@ -101,7 +112,7 @@ jupyter lab notebooks/
 |---|---|
 | Missing processed files or missing `product_text` | Run `python src/prepare_data.py` |
 | Dual-encoder weights not found | Run `python src/train.py`, or use `--baseline-only` |
-| MiniLM download fails | Provide internet access once or pre-cache Hugging Face artifacts |
+| MiniLM / Hugging Face download fails | Connect to internet/Wi-Fi once, then rerun; or pre-cache the Hugging Face MiniLM artifacts |
 | Slow training on Windows | Expected on CPU; WSL2/Colab GPU is optional |
 
 ## Submission Artifacts
