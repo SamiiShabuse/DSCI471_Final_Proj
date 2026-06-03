@@ -94,7 +94,7 @@ The final processed dataset contains:
 | Master categories | 6 |
 | Article types | 107 |
 | Base colors | 46 |
-| Products with loaded JSON descriptions | 44,136 |
+| Products with loaded JSON descriptions | 43,983 |
 | Median `product_text` length | 674 characters |
 | Mean `product_text` length | 638 characters |
 
