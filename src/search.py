@@ -1,4 +1,4 @@
-"""Load retrieval models and run text → product search."""
+"""Load retrieval models and run text-to-product search."""
 
 import numpy as np
 import pandas as pd

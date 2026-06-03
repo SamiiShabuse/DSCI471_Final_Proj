@@ -1,5 +1,5 @@
 """
-Fashion multimodal retrieval — shared source package.
+Fashion multimodal retrieval - shared source package.
 
 Module layout:
   paths.py              Project directories and artifact paths

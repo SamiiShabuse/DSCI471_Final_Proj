@@ -12,7 +12,7 @@ import numpy as np
 import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT))
+sys.path.insert(0, str(ROOT / "src"))
 
 from baseline_keyword import build_keyword_index
 from paths import DATA_PROCESSED_DIR
