@@ -28,3 +28,7 @@ __pycache__/
 
 # Smoke-test eval output (full results stay in evaluation_results.csv)
 docs/reports/evaluation_results_sample.csv
+docs/reports/evaluation_results_smoke_check.csv
+docs/reports/evaluation_results_dual_smoke_check.csv
+docs/reports/hybrid_results.csv
+docs/reports/hybrid_smoke_check.csv
