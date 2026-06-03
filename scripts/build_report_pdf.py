@@ -149,7 +149,7 @@ def build_html() -> str:
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Final Report — Multimodal Fashion Search</title>
+  <title>Final Report - Multimodal Fashion Search</title>
   <style>{CSS}</style>
 </head>
 <body>

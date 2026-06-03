@@ -392,6 +392,19 @@ python src/train.py
 python src/evaluate.py
 ```
 
+Quick verification commands:
+
+```powershell
+python src/prepare_data.py --check
+python src/evaluate.py --baseline-only --sample 100 --output docs/reports/evaluation_results_smoke_check.csv
+```
+
+Expected results:
+
+- `prepare_data.py --check` reports that processed splits are valid.
+- The TF-IDF smoke evaluation completes on a 100-product sample and writes the requested CSV.
+- The smoke CSV is only a local verification artifact; the official results remain in `docs/reports/evaluation_results.csv`.
+
 Important artifact notes:
 
 - `docs/reports/evaluation_results.csv` contains the committed final metrics.
@@ -401,7 +414,7 @@ Important artifact notes:
 
 Useful files:
 
-- Grading guide: `docs/GRADING.md`
+- Grading guide: `GRADING.md`
 - Artifact guide: `docs/ARTIFACTS.md`
 - Final report PDF: `docs/reports/final_report.pdf`
 - Interactive demos: `notebooks/samii_experiment/04_final_results.ipynb`
@@ -409,7 +422,21 @@ Useful files:
 
 ---
 
-## Appendix B - Team Contributions
+## Appendix B - Rubric Alignment
+
+| Rubric category | Evidence in this submission |
+|---|---|
+| Problem Definition & Clarity | Sections 1.1-1.3 define the e-commerce retrieval problem, research question, motivation, and project contributions. |
+| Data Collection & Exploratory Analytics | Section 3 documents Kaggle data collection, filtering, JSON enrichment, image-text pairing, query styles, split sizes, and EDA figures. |
+| Methodology & Model Justification | Section 4 justifies EfficientNetB0, MiniLM, projection head dimensions, GELU, Dropout, L2 normalization, contrastive loss, temperature, and two-stage fine-tuning. |
+| Technical Evaluation & Architecture Comparison | Sections 5-6 compare TF-IDF against the v4 dual-encoder with Top-1, Top-5, MRR, Precision@5, validation ablations, and held-out test metrics. |
+| Interpretation & Critical Thinking | Section 7 explains the modality gap, why TF-IDF wins Top-1, why the dual-encoder still matters, and whether the result reflects overfitting, underfitting, or a data/evaluation ceiling. |
+| Technical Documentation & Rigor | Appendix A, `GRADING.md`, `docs/ARTIFACTS.md`, `README.md`, notebooks, scripts, source modules, figures, PDFs, and committed result CSVs document reproduction and grading evidence. |
+| In-Class Presentation | `docs/presentation.pdf`, `docs/presentation_slides.md`, and `docs/presentation_assets/speaker_notes.md` cover problem, data, method, metrics, results, limitations, and teamwork/training reflection. |
+
+---
+
+## Appendix C - Team Contributions
 
 | Richardson Chhin | Samii Shabuse |
 |---|---|

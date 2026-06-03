@@ -116,15 +116,15 @@ body {
 SLIDES = [
     {
         "title": "Multimodal Deep Learning Search Engine for E-commerce Fashion",
-        "subtitle": "Richardson Chhin · Samii Shabuse · DSCI471 · May 2026",
+        "subtitle": "Richardson Chhin - Samii Shabuse - DSCI471 - May 2026",
         "body": "",
     },
     {
         "h2": "Problem & motivation",
         "body": """
 <ul>
-<li>Shoppers describe products in natural language — e.g. <em>"a flowy floral dress with cap sleeves"</em> — but catalogs rely on keywords.</li>
-<li>We build a retriever that maps <strong>text queries → product images</strong> in a shared embedding space.</li>
+<li>Shoppers describe products in natural language - e.g. <em>"a flowy floral dress with cap sleeves"</em> - but catalogs rely on keywords.</li>
+<li>We build a retriever that maps <strong>text queries -> product images</strong> in a shared embedding space.</li>
 <li>Dataset: <strong>44,265</strong> fashion products (Kaggle Fashion Product Images).</li>
 </ul>""",
     },
@@ -134,7 +134,7 @@ SLIDES = [
 <blockquote>Can a dual-encoder deep learning model, trained on paired fashion images and text, <strong>outperform traditional keyword-based e-commerce search</strong>?</blockquote>
 <ul>
 <li><strong>Baseline:</strong> TF-IDF on product_text (caption + JSON description).</li>
-<li><strong>Proposed:</strong> Dual-encoder — text query → embedding ← product image embedding.</li>
+<li><strong>Proposed:</strong> Dual-encoder - text query -> embedding <- product image embedding.</li>
 </ul>""",
     },
     {
@@ -162,21 +162,21 @@ SLIDES = [
     {
         "h2": "Architecture (v4)",
         "body": """
-<pre>Text query  →  MiniLM (frozen)  →  384-d embedding
-                                        ↓ cosine similarity
-Product image → EfficientNetB0 (fine-tuned) → 384-d embedding</pre>
+<pre>Text query  ->  MiniLM (frozen)  ->  384-d embedding
+                                        cosine similarity
+Product image -> EfficientNetB0 (fine-tuned) -> 384-d embedding</pre>
 <ul>
-<li>Contrastive loss, τ = 0.07</li>
-<li>Selected after v1→v5 ablations — pretrained text encoder = largest gain</li>
+<li>Contrastive loss, tau = 0.07</li>
+<li>Selected after v1->v5 ablations - pretrained text encoder = largest gain</li>
 </ul>""",
     },
     {
         "h2": "Ablation progression (validation)",
         "img": "ablation_progression.png",
-        "caption": "Recall@1 on templated queries — v4 (MiniLM) nearly doubled v1",
+        "caption": "Recall@1 on templated queries - v4 (MiniLM) nearly doubled v1",
     },
     {
-        "h2": "Results — test set (4,427 products)",
+        "h2": "Results - test set (4,427 products)",
         "img": "test_metrics_comparison.png",
         "caption": "TF-IDF wins Top-1 on every query style",
     },
@@ -197,33 +197,33 @@ Product image → EfficientNetB0 (fine-tuned) → 384-d embedding</pre>
         "caption": "Higher Top-5 (0.24 vs 0.22) and MRR (0.167 vs 0.161)",
     },
     {
-        "h2": "Demo — success (templated query)",
+        "h2": "Demo - success (templated query)",
         "img": "demo_success_templated.png",
     },
     {
-        "h2": "Demo — head-to-head (brand query)",
+        "h2": "Demo - head-to-head (brand query)",
         "img": "demo_head_to_head_brand.png",
     },
     {
-        "h2": "Demo — failure (shopper query)",
+        "h2": "Demo - failure (shopper query)",
         "img": "demo_failure_shopper.png",
     },
     {
         "h2": "Limitations",
         "body": """
 <ul>
-<li><strong>Modality gap</strong> — text→image vs TF-IDF text→text</li>
-<li><strong>Low Top-1</strong> — both models struggle on shopper/short (~5–8%)</li>
-<li><strong>Synthetic queries</strong> — not real search logs</li>
-<li><strong>Compute</strong> — ~40 min CPU training</li>
+<li><strong>Modality gap</strong> - text->image vs TF-IDF text->text</li>
+<li><strong>Low Top-1</strong> - both models struggle on shopper/short (~5-8%)</li>
+<li><strong>Synthetic queries</strong> - not real search logs</li>
+<li><strong>Compute</strong> - ~40 min CPU training</li>
 </ul>""",
     },
     {
         "h2": "Conclusion & future work",
         "body": """
 <p><strong>Conclusion:</strong> Keyword search wins Top-1 when the gallery is text-indexed. Dual-encoder is viable for cross-modal retrieval and wins on shopper Top-5 / MRR.</p>
-<p><strong>Future work:</strong> fine-tune text tower, hard negatives, CLIP-style pretraining, hybrid TF-IDF → dual reranking.</p>
-<p class="footer">Full report: docs/reports/final_report.pdf · Repro: docs/GRADING.md</p>
+<p><strong>Future work:</strong> fine-tune text tower, hard negatives, CLIP-style pretraining, hybrid TF-IDF -> dual reranking.</p>
+<p class="footer">Full report: docs/reports/final_report.pdf - Repro: GRADING.md</p>
 <p class="footer"><strong>Thank you!</strong></p>""",
     },
 ]
@@ -254,7 +254,7 @@ def build_html() -> str:
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Multimodal Fashion Search — Presentation</title>
+  <title>Multimodal Fashion Search - Presentation</title>
   <style>{CSS}</style>
 </head>
 <body>

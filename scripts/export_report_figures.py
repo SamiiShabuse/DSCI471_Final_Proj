@@ -95,7 +95,7 @@ def export_shopper_comparison_chart() -> None:
     ax.grid(axis="y", alpha=0.25)
     for i, (t, d) in enumerate(zip(tfidf, dual)):
         winner = "Dual" if d > t else "TF-IDF"
-        ax.text(i, max(t, d) + 0.008, f"↑ {winner}" if winner == "Dual" else "", ha="center", fontsize=9)
+        ax.text(i, max(t, d) + 0.008, f"^ {winner}" if winner == "Dual" else "", ha="center", fontsize=9)
     plt.tight_layout()
     _save(fig, "shopper_metrics_comparison.png")
 
@@ -248,7 +248,7 @@ def export_retrieval_demos() -> None:
             img = Image.open(resolve_image_path(row["image_path"], ROOT))
             axes[0, col].imshow(img)
             axes[0, col].axis("off")
-            mark = "\n✓" if row["id"] == target_id else ""
+            mark = "\n(correct)" if row["id"] == target_id else ""
             axes[0, col].set_title(str(row["productDisplayName"])[:24] + mark, fontsize=7)
         axes[0, 0].set_ylabel("TF-IDF", fontsize=11, fontweight="bold")
 
@@ -257,7 +257,7 @@ def export_retrieval_demos() -> None:
             img = Image.open(resolve_image_path(row["image_path"], ROOT))
             axes[1, col].imshow(img)
             axes[1, col].axis("off")
-            mark = "\n✓" if row["id"] == target_id else ""
+            mark = "\n(correct)" if row["id"] == target_id else ""
             axes[1, col].set_title(str(row["productDisplayName"])[:24] + mark, fontsize=7)
         axes[1, 0].set_ylabel("Dual-encoder", fontsize=11, fontweight="bold")
         fig.suptitle(f"Head-to-head: same brand query\n{query}", fontsize=11, fontweight="bold")
@@ -277,7 +277,7 @@ def export_retrieval_demos() -> None:
     if success_row is not None:
         q_emb = encode_texts(text_encoder, [success_query])
         top_idx = (q_emb @ image_emb.T).flatten().argsort()[::-1][:5]
-        save_retrieval_row("Success — dual-encoder (templated query)", success_query, success_row["id"], top_idx, "demo_success_templated.png")
+        save_retrieval_row("Success - dual-encoder (templated query)", success_query, success_row["id"], top_idx, "demo_success_templated.png")
 
     # Head-to-head brand query
     brand_row = test_df.sample(1, random_state=33).iloc[0]
@@ -290,7 +290,7 @@ def export_retrieval_demos() -> None:
         query = QUERY_GENERATORS["shopper"](row)
         top_idx = dual_top_k(query, 5)
         if row["id"] not in test_df.iloc[top_idx]["id"].values:
-            save_retrieval_row("Failure — shopper query (dual-encoder)", query, row["id"], top_idx, "demo_failure_shopper.png")
+            save_retrieval_row("Failure - shopper query (dual-encoder)", query, row["id"], top_idx, "demo_failure_shopper.png")
             break
 
 
